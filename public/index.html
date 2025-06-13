@@ -4,71 +4,144 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Generador de Contratos</title>
+  <!-- Enlazamos el CSS -->
   <link rel="stylesheet" href="/estilos.css" />
   <link rel="icon" type="image/png" href="logo.png" />
 </head>
 <body>
 
-  <!-- Encabezado -->
-  <div style="background-color: #fff; padding: 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ccc;">
+  <!-- ===========================
+       ENCABEZADO CON LOGO Y TÍTULO
+       =========================== -->
+  <div style="
+      background-color: #fff;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #ccc;
+    ">
     <div style="display: flex; align-items: center;">
       <img src="/logo.png" alt="Logo Rai Trai" style="height: 60px; margin-right: 1rem;">
       <div>
-        <h2 style="margin: 0; font-size: 1.5rem; color: #2c3e50;">GENERADOR AUTOMÁTICO DE CONTRATOS</h2>
-        <p style="margin: 0; font-size: 0.9rem;"><strong>Plantilla fija en servidor</strong></p>
+        <h2 style="margin: 0; font-size: 1.5rem; color: #2c3e50;">
+          GENERADOR AUTOMÁTICO DE CONTRATOS
+        </h2>
+        <p style="margin: 0; font-size: 0.9rem;">
+          <strong>Plantilla fija en servidor</strong>
+        </p>
       </div>
     </div>
   </div>
 
+  <!-- ===========================
+       CONTENEDOR PRINCIPAL
+       =========================== -->
   <div class="contenedor">
+    <!-- Sección de datos básicos del contrato -->
     <h2>Datos del Contrato</h2>
     <div class="grid">
-      <label>Fecha del Contrato:<input type="date" id="FECHA_CONTRATO" /></label>
-      <label>Curso:<input type="text" id="CURSO" /></label>
-      <label>Año:<input type="number" id="AÑO" /></label>
-      <label>Colegio:<input type="text" id="COLEGIO" /></label>
-      <label>Comuna:<input type="text" id="COMUNA" /></label>
-      <label>Valor Programa:<input type="text" id="VALOR_PROGRAMA" /></label>
-      <label>PAX Mínimos:<input type="number" id="PAX_MIN" /></label>
-      <label>PAX Liberados:<input type="number" id="PAX_LIBERADOS" /></label>
-      <label>Cuota Inscripción:<input type="text" id="CUOTA_INSCRIPCION" /></label>
-      <label>Fecha Inscripción:<input type="date" id="FECHA_INSCRIPCION" /></label>
-      <label>Fecha Pago Final:<input type="date" id="FECHA_PAGO_FINAL" /></label>
+      <label>
+        Fecha del Contrato:
+        <input type="date" id="FECHA_CONTRATO" />
+      </label>
+      <label>
+        Curso:
+        <input type="text" id="CURSO" placeholder="Ej. 3B" />
+      </label>
+      <label>
+        Año:
+        <input type="number" id="AÑO" placeholder="Ej. 2025" />
+      </label>
+      <label>
+        Colegio:
+        <input type="text" id="COLEGIO" placeholder="Nombre del colegio" />
+      </label>
+      <label>
+        Comuna:
+        <input type="text" id="COMUNA" placeholder="Ej. Providencia" />
+      </label>
+      <label>
+        Valor Programa:
+        <input type="text" id="VALOR_PROGRAMA" placeholder="Ej. $1.200 USD" />
+      </label>
+      <label>
+        PAX Mínimos:
+        <input type="number" id="PAX_MIN" placeholder="Ej. 20" />
+      </label>
+      <label>
+        PAX Liberados:
+        <input type="number" id="PAX_LIBERADOS" placeholder="Ej. 2" />
+      </label>
+      <label>
+        Cuota Inscripción:
+        <input type="text" id="CUOTA_INSCRIPCION" placeholder="Ej. $150 USD" />
+      </label>
+      <label>
+        Fecha Inscripción:
+        <input type="date" id="FECHA_INSCRIPCION" />
+      </label>
+      <label>
+        Fecha Pago Final:
+        <input type="date" id="FECHA_PAGO_FINAL" />
+      </label>
     </div>
 
+    <!-- Sección dinámica de cláusulas adicionales -->
     <h2>Cláusulas adicionales</h2>
     <div id="clausulasContainer"></div>
-    <button id="addClause" style="margin-bottom:1rem;">➕ Agregar cláusula</button>
+    <button id="addClause" style="margin-bottom:1rem;">
+      ➕ Agregar cláusula
+    </button>
 
+    <!-- Botón para generar y descargar el PDF -->
     <button onclick="generarContrato()">📄 Descargar PDF</button>
+    <!-- Área para mostrar estado de procesamiento -->
     <div id="estado" style="margin-top:1rem; font-style:italic; color:#555;"></div>
   </div>
 
+  <!-- ===========================
+       SCRIPT DE INTERACCIÓN
+       =========================== -->
   <script>
-    // Agregar/Eliminar cláusulas
+    // 1) Funcionalidad para agregar y eliminar cláusulas dinámicamente
     document.getElementById("addClause").addEventListener("click", () => {
       const cont = document.getElementById("clausulasContainer");
       const wrapper = document.createElement("div");
       wrapper.classList.add("clausula");
       wrapper.style.marginBottom = "1rem";
       wrapper.innerHTML = `
-        <label>Título cláusula:<input type="text" name="titulo" placeholder="Ej: Fuerza mayor" /></label>
-        <label>Texto cláusula:<textarea name="texto" rows="4" placeholder="Redacta la cláusula aquí…"></textarea></label>
-        <button type="button" class="removeClause" style="background:#c0392b;">Eliminar</button>
+        <label>
+          Título cláusula:
+          <input type="text" name="titulo" placeholder="Ej: Fuerza mayor" />
+        </label>
+        <label>
+          Texto cláusula:
+          <textarea name="texto" rows="4" placeholder="Redacta la cláusula aquí…"></textarea>
+        </label>
+        <button type="button" class="removeClause" style="background:#c0392b; color:#fff; margin-top:0.5rem;">
+          Eliminar
+        </button>
       `;
       cont.appendChild(wrapper);
+      // Eliminar este bloque al pulsar “Eliminar”
       wrapper.querySelector(".removeClause").onclick = () => wrapper.remove();
     });
 
+    // 2) Función principal: recopila datos y llama a la API para generar el PDF
     async function generarContrato() {
-      // 1) Datos del formulario
-      const campos = ['FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
-                      'VALOR_PROGRAMA','PAX_MIN','PAX_LIBERADOS',
-                      'CUOTA_INSCRIPCION','FECHA_INSCRIPCION','FECHA_PAGO_FINAL'];
+      // Recoger valores de los campos fijos
+      const campos = [
+        'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
+        'VALOR_PROGRAMA','PAX_MIN','PAX_LIBERADOS',
+        'CUOTA_INSCRIPCION','FECHA_INSCRIPCION','FECHA_PAGO_FINAL'
+      ];
       const data = {};
-      campos.forEach(id => data[id] = document.getElementById(id).value);
+      campos.forEach(id => {
+        data[id] = document.getElementById(id).value;
+      });
 
-      // 2) Recolectar cláusulas
+      // Recoger cláusulas adicionales en un array
       data.clausulas = Array.from(
         document.querySelectorAll("#clausulasContainer .clausula")
       ).map(div => ({
@@ -76,18 +149,25 @@
         texto:  div.querySelector("textarea[name=texto]").value
       })).filter(c => c.titulo || c.texto);
 
-      // 3) Llamada al servidor
+      // Mostrar mensaje de estado
       document.getElementById("estado").textContent = "⏳ Generando PDF…";
+
       try {
-        const res = await fetch("/generar", {
+        // Llamada a la función serverless en Vercel
+        const res = await fetch("/api/generar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(await res.text());
+
+        // Obtener el blob del PDF y forzar descarga
         const blob = await res.blob();
-        const filename = res.headers.get("Content-Disposition")
-                             .match(/filename="?(.+)"?$/)[1];
+        const disposition = res.headers.get("Content-Disposition");
+        const filename = disposition
+          ? disposition.match(/filename="?(.+)"?$/)[1]
+          : "contrato.pdf";
+
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = filename;
@@ -97,6 +177,7 @@
       } catch (err) {
         alert("Error: " + err.message);
       } finally {
+        // Limpiar mensaje de estado
         document.getElementById("estado").textContent = "";
       }
     }
