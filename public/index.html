@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Generador de Contratos</title>
-  <!-- === Enlazamos el CSS === -->
+  <!-- === Enlace al CSS principal === -->
   <link rel="stylesheet" href="/estilos.css" />
+  <!-- === PapaParse para parsear el CSV de Google Sheets === -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <link rel="icon" type="image/png" href="logo.png" />
 </head>
 <body>
@@ -142,7 +144,9 @@
        SCRIPT DE INTERACCIÓN
        =========================== -->
   <script>
-    // Agregar/eliminar cláusulas dinámicamente
+    // —————————————————————————————
+    // Funcionalidad dinámicas de cláusulas
+    // —————————————————————————————
     document.getElementById("addClause").addEventListener("click", () => {
       const cont = document.getElementById("clausulasContainer");
       const wrapper = document.createElement("div");
@@ -162,11 +166,15 @@
         </button>
       `;
       cont.appendChild(wrapper);
+      // Botón “Eliminar” quita este bloque
       wrapper.querySelector(".removeClause").onclick = () => wrapper.remove();
     });
 
-    // Generar y descargar el contrato (DOCX)
+    // —————————————————————————————
+    // Enviar formulario y descargar DOCX
+    // —————————————————————————————
     async function generarContrato() {
+      // 1) Recoger valores de todos los campos fijos
       const campos = [
         'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
         'VALOR_PROGRAMA','PAX_MIN','PAX_LIBERADOS',
@@ -174,9 +182,11 @@
         'MONEDA','CUOTA_INSCRIPCION','FECHA_INSCRIPCION','FECHA_PAGO_FINAL'
       ];
       const data = {};
-      campos.forEach(id => data[id] = document.getElementById(id).value);
+      campos.forEach(id => {
+        data[id] = document.getElementById(id).value;
+      });
 
-      // Recoger cláusulas adicionales
+      // 2) Recoger cláusulas adicionales
       data.clausulas = Array.from(
         document.querySelectorAll("#clausulasContainer .clausula")
       ).map(div => ({
@@ -184,8 +194,11 @@
         texto:  div.querySelector("textarea[name=texto]").value
       })).filter(c => c.titulo || c.texto);
 
+      // 3) Notificar inicio de proceso
       document.getElementById("estado").textContent = "⏳ Generando contrato…";
+
       try {
+        // 4) Llamada al endpoint serverless
         const res = await fetch("/api/generar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -193,7 +206,7 @@
         });
         if (!res.ok) throw new Error(await res.text());
 
-        // Descargar el DOCX
+        // 5) Descargar el DOCX generado
         const blob = await res.blob();
         const disposition = res.headers.get("Content-Disposition");
         const filename = disposition
@@ -208,68 +221,77 @@
       } catch (err) {
         alert("Error: " + err.message);
       } finally {
+        // 6) Limpiar mensaje de estado
         document.getElementById("estado").textContent = "";
       }
     }
 
-    // === PASO 3: CARGAR LA SHEET CON JSON GVIZ ===
+    // —————————————————————————————
+    // PASO 3: CARGAR SHEET COMO CSV con PapaParse
+    // —————————————————————————————
     window.addEventListener('DOMContentLoaded', () => {
-      const sheetJsonUrl =
+      // URL de export CSV de tu Google Sheet (debe ser pública)
+      const sheetCsvUrl =
         'https://docs.google.com/spreadsheets/d/' +
         '1WR40RDW3tQFQ94YEwXhfXsVYpf4iqVXq33arFQKCOaI' +
-        '/gviz/tq?gid=0&tqx=out:json';
+        '/export?format=csv&gid=0';
 
-      fetch(sheetJsonUrl)
-        .then(r => r.text())
-        .then(txt => {
-          const jsonText = txt
-            .replace(/^[^\(]*\(/, '')
-            .replace(/\);?$/, '');
-          const table = JSON.parse(jsonText).table;
-          const headers = table.cols.map(c => c.label);
-          const rows = table.rows.map(r => {
-            const obj = {};
-            r.c.forEach((cell,i) => {
-              obj[headers[i]] = cell?.v ?? '';
-            });
-            return obj;
-          });
+      Papa.parse(sheetCsvUrl, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        error: err => {
+          console.error("Error cargando CSV:", err);
+          document.getElementById('estado').textContent =
+            "❌ No se pudo cargar la hoja. Revisa permisos o URL.";
+        },
+        complete: results => {
+          const rows = results.data;
+          const bList = document.getElementById('businessList');
+          const gList = document.getElementById('grupoList');
 
-          const businessList = document.getElementById('businessList');
-          const grupoList    = document.getElementById('grupoList');
-
+          // 1) Poblar datalists con Número de negocio y Nombre de Grupo
           rows.forEach(r => {
             if (r['Número de negocio']) {
               const opt = document.createElement('option');
               opt.value = r['Número de negocio'];
-              businessList.appendChild(opt);
+              bList.appendChild(opt);
             }
             if (r['Nombre de Grupo']) {
               const opt = document.createElement('option');
               opt.value = r['Nombre de Grupo'];
-              grupoList.appendChild(opt);
+              gList.appendChild(opt);
             }
           });
 
+          // 2) Al seleccionar cualquiera, autocompletar formulario
           ['numeroNegocio','nombreGrupo'].forEach(id => {
-            document.getElementById(id).addEventListener('change', e => {
-              const val = e.target.value;
-              const key = id === 'numeroNegocio'
-                ? 'Número de negocio'
-                : 'Nombre de Grupo';
-              const row = rows.find(r => (r[key]+'') === (val+''));
-              if (row) fillFromRow(row);
-            });
+            document.getElementById(id)
+              .addEventListener('change', e => {
+                const val = e.target.value.trim();
+                const key = id === 'numeroNegocio'
+                  ? 'Número de negocio'
+                  : 'Nombre de Grupo';
+                const row = rows.find(r =>
+                  (r[key]||'').toString().trim() === val
+                );
+                if (row) fillFromRow(row);
+              });
           });
 
+          // 3) Rellenar campos desde la fila seleccionada
           function fillFromRow(r) {
+            // Extraer colegio/curso/año con regex
             const text = r['Nombre de Grupo'] || '';
-            const m = text.match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
+            const m = text.match(
+              /^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/
+            );
             if (m) {
-              document.getElementById('COLEGIO').value = capitalize(m[1]);
-              document.getElementById('CURSO').value   = m[2];
-              document.getElementById('AÑO').value     = m[3];
+              document.getElementById('COLEGIO').value  = capitalize(m[1]);
+              document.getElementById('CURSO').value    = m[2];
+              document.getElementById('AÑO').value      = m[3];
             }
+            // Rellenar resto de campos
             document.getElementById('COMUNA').value        = r['direccion']    || '';
             const vp = r['valorPrograma'] || '';
             document.getElementById('MONEDA').value        = vp.includes('USD') ? 'USD' : 'CLP';
@@ -277,15 +299,13 @@
             document.getElementById('PAX_MIN').value       = r['cantidadgrupo'] || '';
             document.getElementById('PAX_LIBERADOS').value = r['liberados']     || '';
           }
+
+          // Función auxiliar: capitalizar cada palabra
           function capitalize(s) {
             return s.trim().replace(/\b\w/g, c => c.toUpperCase());
           }
-        })
-        .catch(err => {
-          console.error('No se pudo leer la hoja:', err);
-          document.getElementById('estado').textContent =
-            '❌ Error cargando datos de la hoja pública.';
-        });
+        }
+      });
     });
   </script>
 
