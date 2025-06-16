@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Generador de Contratos</title>
-  <!-- === Ya no usamos PapaParse, pasamos a JSON vía Google Sheets gviz === -->
   <!-- === Enlazamos el CSS === -->
   <link rel="stylesheet" href="/estilos.css" />
   <link rel="icon" type="image/png" href="logo.png" />
@@ -91,6 +90,22 @@
         PAX Liberados:
         <input type="number" id="PAX_LIBERADOS" placeholder="Ej. 2" />
       </label>
+
+      <!-- ——— Nuevo campo: Email destinatario ——— -->
+      <label>
+        Email destinatario:
+        <input list="emailList" id="DEST_EMAIL" placeholder="Selecciona un email" />
+      </label>
+      <datalist id="emailList">
+        <option value="griveros@raitrai.cl">
+        <option value="cgayoso@raitrai.cl">
+        <option value="crojas@raitrai.cl">
+        <option value="orietta@raitrai.cl">
+        <option value="elagos@raitrai.cl">
+        <option value="aflores@raitrai.cl">
+        <option value="chernandez@raitrai.cl">
+      </datalist>
+
       <label>
         Moneda:
         <input type="text" id="MONEDA" readonly />
@@ -118,9 +133,8 @@
       ➕ Agregar cláusula
     </button>
 
-    <!-- Botón para generar y descargar el PDF -->
-    <button onclick="generarContrato()">📄 Descargar PDF</button>
-    <!-- Área para mostrar estado de procesamiento -->
+    <!-- Botón para generar y descargar el DOCX -->
+    <button onclick="generarContrato()">📄 Descargar Contrato</button>
     <div id="estado" style="margin-top:1rem; font-style:italic; color:#555;"></div>
   </div>
 
@@ -128,7 +142,7 @@
        SCRIPT DE INTERACCIÓN
        =========================== -->
   <script>
-    // === Función para añadir/eliminar cláusulas ===
+    // Agregar/eliminar cláusulas dinámicamente
     document.getElementById("addClause").addEventListener("click", () => {
       const cont = document.getElementById("clausulasContainer");
       const wrapper = document.createElement("div");
@@ -151,15 +165,18 @@
       wrapper.querySelector(".removeClause").onclick = () => wrapper.remove();
     });
 
-    // === Función para generar y descargar el PDF ===
+    // Generar y descargar el contrato (DOCX)
     async function generarContrato() {
       const campos = [
         'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
         'VALOR_PROGRAMA','PAX_MIN','PAX_LIBERADOS',
+        'DEST_EMAIL',
         'MONEDA','CUOTA_INSCRIPCION','FECHA_INSCRIPCION','FECHA_PAGO_FINAL'
       ];
       const data = {};
       campos.forEach(id => data[id] = document.getElementById(id).value);
+
+      // Recoger cláusulas adicionales
       data.clausulas = Array.from(
         document.querySelectorAll("#clausulasContainer .clausula")
       ).map(div => ({
@@ -167,7 +184,7 @@
         texto:  div.querySelector("textarea[name=texto]").value
       })).filter(c => c.titulo || c.texto);
 
-      document.getElementById("estado").textContent = "⏳ Generando PDF…";
+      document.getElementById("estado").textContent = "⏳ Generando contrato…";
       try {
         const res = await fetch("/api/generar", {
           method: "POST",
@@ -175,11 +192,13 @@
           body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(await res.text());
+
+        // Descargar el DOCX
         const blob = await res.blob();
         const disposition = res.headers.get("Content-Disposition");
         const filename = disposition
           ? disposition.match(/filename="?(.+)"?$/)[1]
-          : "contrato.pdf";
+          : "Contrato.docx";
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = filename;
@@ -195,32 +214,30 @@
 
     // === PASO 3: CARGAR LA SHEET CON JSON GVIZ ===
     window.addEventListener('DOMContentLoaded', () => {
-      // URL pública de tu Google Sheet en modo JSON
       const sheetJsonUrl =
         'https://docs.google.com/spreadsheets/d/' +
-        '1iofzpqNx87iD_YF8SDXn4TiT5XoSCgfEoQ4LC254scU/' +
+        '1iofzpqNx87iD_YF8SDXn4TiT5oSCgfEoQ4LC254scU/' +
         'gviz/tq?gid=1151545728&tqx=out:json';
 
       fetch(sheetJsonUrl)
         .then(r => r.text())
         .then(txt => {
-          // Limpiar envoltorio de Google y parsear JSON
           const jsonText = txt
-            .replace(/^[^\(]*\(/, '')   // quitar hasta primer (
-            .replace(/\);?$/, '');     // quitar ); al final
+            .replace(/^[^\(]*\(/, '')
+            .replace(/\);?$/, '');
           const table = JSON.parse(jsonText).table;
           const headers = table.cols.map(c => c.label);
           const rows = table.rows.map(r => {
             const obj = {};
-            r.c.forEach((cell, i) => {
+            r.c.forEach((cell,i) => {
               obj[headers[i]] = cell?.v ?? '';
             });
             return obj;
           });
 
-          // Poblar los datalists
           const businessList = document.getElementById('businessList');
-          const grupoList   = document.getElementById('grupoList');
+          const grupoList    = document.getElementById('grupoList');
+
           rows.forEach(r => {
             if (r['Número de negocio']) {
               const opt = document.createElement('option');
@@ -234,44 +251,38 @@
             }
           });
 
-          // Eventos de selección para autocompletar
           ['numeroNegocio','nombreGrupo'].forEach(id => {
             document.getElementById(id).addEventListener('change', e => {
               const val = e.target.value;
               const key = id === 'numeroNegocio'
                 ? 'Número de negocio'
                 : 'Nombre de Grupo';
-              const row = rows.find(r => r[key] + '' === val + '');
+              const row = rows.find(r => (r[key]+'') === (val+''));
               if (row) fillFromRow(row);
             });
           });
 
-          // Función que rellena el formulario a partir de la fila
           function fillFromRow(r) {
             const text = r['Nombre de Grupo'] || '';
-            const m = text.match(
-              /^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/
-            );
+            const m = text.match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
             if (m) {
-              document.getElementById('COLEGIO').value  = capitalize(m[1]);
-              document.getElementById('CURSO').value    = m[2];
-              document.getElementById('AÑO').value      = m[3];
+              document.getElementById('COLEGIO').value = capitalize(m[1]);
+              document.getElementById('CURSO').value   = m[2];
+              document.getElementById('AÑO').value     = m[3];
             }
             document.getElementById('COMUNA').value        = r['direccion']    || '';
             const vp = r['valorPrograma'] || '';
             document.getElementById('MONEDA').value        = vp.includes('USD') ? 'USD' : 'CLP';
-            document.getElementById('VALOR_PROGRAMA').value = vp.replace(/[^\d]/g, '');
+            document.getElementById('VALOR_PROGRAMA').value = vp.replace(/[^\d]/g,'');
             document.getElementById('PAX_MIN').value       = r['cantidadgrupo'] || '';
             document.getElementById('PAX_LIBERADOS').value = r['liberados']     || '';
           }
-
-          // Capitaliza la primera letra de cada palabra
           function capitalize(s) {
             return s.trim().replace(/\b\w/g, c => c.toUpperCase());
           }
         })
         .catch(err => {
-          console.error('No se pudo leer la sheet:', err);
+          console.error('No se pudo leer la hoja:', err);
           document.getElementById('estado').textContent =
             '❌ Error cargando datos de la hoja pública.';
         });
