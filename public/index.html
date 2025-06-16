@@ -45,14 +45,12 @@
     <h2>Seleccionar Grupo</h2>
     <label>
       Número de Negocio:
-      <!-- input con datalist para número de negocio -->
       <input list="businessList" id="numeroNegocio" placeholder="Buscar..." />
     </label>
     <datalist id="businessList"></datalist>
 
     <label>
       Nombre de Grupo:
-      <!-- input con datalist para nombre de grupo -->
       <input list="grupoList" id="nombreGrupo" placeholder="Buscar..." />
     </label>
     <datalist id="grupoList"></datalist>
@@ -95,7 +93,6 @@
         <input type="number" id="PAX_LIBERADOS" placeholder="Ej. 2" />
       </label>
       <label>
-        <!-- Nuevo input de MONEDA, readonly porque se autocompleta -->
         Moneda:
         <input type="text" id="MONEDA" readonly />
       </label>
@@ -122,9 +119,7 @@
       ➕ Agregar cláusula
     </button>
 
-    <!-- Botón para generar y descargar el PDF -->
     <button onclick="generarContrato()">📄 Descargar PDF</button>
-    <!-- Área para mostrar estado de procesamiento -->
     <div id="estado" style="margin-top:1rem; font-style:italic; color:#555;"></div>
   </div>
 
@@ -132,7 +127,7 @@
        SCRIPT DE INTERACCIÓN
        =========================== -->
   <script>
-    // 1) Funcionalidad para agregar y eliminar cláusulas dinámicamente
+    // Funcionalidad para agregar/eliminar cláusulas
     document.getElementById("addClause").addEventListener("click", () => {
       const cont = document.getElementById("clausulasContainer");
       const wrapper = document.createElement("div");
@@ -155,7 +150,7 @@
       wrapper.querySelector(".removeClause").onclick = () => wrapper.remove();
     });
 
-    // 2) Función principal: recopila datos y llama a la API para generar el PDF
+    // Generar y descargar PDF
     async function generarContrato() {
       const campos = [
         'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
@@ -163,10 +158,7 @@
         'MONEDA','CUOTA_INSCRIPCION','FECHA_INSCRIPCION','FECHA_PAGO_FINAL'
       ];
       const data = {};
-      campos.forEach(id => {
-        data[id] = document.getElementById(id).value;
-      });
-
+      campos.forEach(id => data[id] = document.getElementById(id).value);
       data.clausulas = Array.from(
         document.querySelectorAll("#clausulasContainer .clausula")
       ).map(div => ({
@@ -175,7 +167,6 @@
       })).filter(c => c.titulo || c.texto);
 
       document.getElementById("estado").textContent = "⏳ Generando PDF…";
-
       try {
         const res = await fetch("/api/generar", {
           method: "POST",
@@ -183,13 +174,11 @@
           body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(await res.text());
-
         const blob = await res.blob();
         const disposition = res.headers.get("Content-Disposition");
         const filename = disposition
           ? disposition.match(/filename="?(.+)"?$/)[1]
           : "contrato.pdf";
-
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = filename;
@@ -204,18 +193,27 @@
     }
 
     // === PASO 3: CARGAR Y PARSEAR LA SHEET ===
-    // Al cargar la página, traemos el CSV exportado de tu Google Sheet y
-    // lo parseamos con PapaParse para poblar los datalists.
     window.addEventListener('DOMContentLoaded', () => {
-      const sheetUrl = 'https://docs.google.com/spreadsheets/d/1iofzpqNx87iD_YF8SDXn4TiT5oSCgfEoQ4LC254scU/export?format=csv&gid=1151545728';
+      // 📌 NUEVO: usamos la URL GViz para exportar CSV público
+      const sheetUrl =
+        'https://docs.google.com/spreadsheets/d/1iofzpqNx87iD_YF8SDXn4TiT5XoSCgfEoQ4LC254scU' +
+        '/gviz/tq?tqx=out:csv&gid=1151545728';
+
       Papa.parse(sheetUrl, {
         download: true,
         header: true,
+        skipEmptyLines: true,
+        // 📌 Manejo de errores de carga
+        error: err => {
+          console.error("Error cargando el CSV:", err);
+          document.getElementById('estado').textContent =
+            "❌ No se pudo cargar la hoja de datos. Revisa permisos o URL.";
+        },
         complete: results => {
           const rows = results.data;
           const businessList = document.getElementById('businessList');
-          const grupoList = document.getElementById('grupoList');
-          // Llenamos los datalists
+          const grupoList   = document.getElementById('grupoList');
+          // Poblar datalists
           rows.forEach(r => {
             if (r['Número de negocio']) {
               const opt = document.createElement('option');
@@ -223,45 +221,41 @@
               businessList.appendChild(opt);
             }
             if (r['Nombre de Grupo']) {
-              const opt2 = document.createElement('option');
-              opt2.value = r['Nombre de Grupo'];
-              grupoList.appendChild(opt2);
+              const opt = document.createElement('option');
+              opt.value = r['Nombre de Grupo'];
+              grupoList.appendChild(opt);
             }
           });
-          // Cuando el usuario seleccione uno de estos inputs, autocompletamos el formulario
-          document.getElementById('numeroNegocio').addEventListener('change', e => {
-            const val = e.target.value;
-            const row = rows.find(r => r['Número de negocio'] === val);
-            if (row) fillFromRow(row);
+          // Al seleccionar, autocompletamos
+          ['numeroNegocio','nombreGrupo'].forEach(id => {
+            document.getElementById(id).addEventListener('change', e => {
+              const val = e.target.value;
+              const key = id === 'numeroNegocio'
+                ? 'Número de negocio'
+                : 'Nombre de Grupo';
+              const row = rows.find(r => r[key] === val);
+              if (row) fillFromRow(row);
+            });
           });
-          document.getElementById('nombreGrupo').addEventListener('change', e => {
-            const val = e.target.value;
-            const row = rows.find(r => r['Nombre de Grupo'] === val);
-            if (row) fillFromRow(row);
-          });
-
           function fillFromRow(r) {
-            // Extraemos Colegio, Curso y Año desde "Nombre de Grupo"
-            // Ej: "SAN AGUSTIN 2A (2025) - 3A (2026)" o "SAN AGUSTIN 3A (2026)"
+            // Extraer Colegio, Curso, Año con regex
             const text = r['Nombre de Grupo'];
             const regex = /^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/;
             const m = text.match(regex);
             if (m) {
-              document.getElementById('COLEGIO').value = capitalize(m[1].toLowerCase());
-              document.getElementById('CURSO').value = m[2];
-              document.getElementById('AÑO').value = m[3];
+              document.getElementById('COLEGIO').value  = capitalize(m[1]);
+              document.getElementById('CURSO').value    = m[2];
+              document.getElementById('AÑO').value      = m[3];
             }
-            // Resto de campos
-            document.getElementById('COMUNA').value = r['direccion'] || '';
-            // Moneda y valorPrograma
+            document.getElementById('COMUNA').value        = r['direccion'] || '';
             const vp = r['valorPrograma'] || '';
-            document.getElementById('MONEDA').value = vp.includes('USD') ? 'USD' : 'CLP';
+            document.getElementById('MONEDA').value        = vp.includes('USD') ? 'USD' : 'CLP';
             document.getElementById('VALOR_PROGRAMA').value = vp.replace(/[^\d]/g, '');
-            document.getElementById('PAX_MIN').value = r['cantidadgrupo'] || '';
+            document.getElementById('PAX_MIN').value       = r['cantidadgrupo'] || '';
             document.getElementById('PAX_LIBERADOS').value = r['liberados'] || '';
           }
           function capitalize(s) {
-            return s.replace(/\b\w/g, c => c.toUpperCase());
+            return s.trim().replace(/\b\w/g, c => c.toUpperCase());
           }
         }
       });
