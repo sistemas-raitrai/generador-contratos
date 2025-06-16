@@ -2,12 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Generador de Contratos</title>
-  <!-- === Enlace al CSS principal === -->
+  <!-- === Estilos === -->
   <link rel="stylesheet" href="/estilos.css" />
-  <!-- === PapaParse para parsear el CSV de Google Sheets === -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <link rel="icon" type="image/png" href="logo.png" />
 </head>
 <body>
@@ -23,15 +21,13 @@
       justify-content: space-between;
       border-bottom: 1px solid #ccc;
     ">
-    <div style="display: flex; align-items: center;">
-      <img src="/logo.png" alt="Logo Rai Trai" style="height: 60px; margin-right: 1rem;">
+    <div style="display:flex; align-items:center;">
+      <img src="/logo.png" alt="Logo Rai Trai" style="height:60px; margin-right:1rem;">
       <div>
-        <h2 style="margin: 0; font-size: 1.5rem; color: #2c3e50;">
+        <h2 style="margin:0; font-size:1.5rem; color:#2c3e50;">
           GENERADOR AUTOMÁTICO DE CONTRATOS
         </h2>
-        <p style="margin: 0; font-size: 0.9rem;">
-          <strong>Plantilla fija en servidor</strong>
-        </p>
+        <p style="margin:0; font-size:0.9rem;"><strong>Plantilla fija en servidor</strong></p>
       </div>
     </div>
   </div>
@@ -92,8 +88,6 @@
         PAX Liberados:
         <input type="number" id="PAX_LIBERADOS" placeholder="Ej. 2" />
       </label>
-
-      <!-- ——— Nuevo campo: Email destinatario ——— -->
       <label>
         Email destinatario:
         <input list="emailList" id="DEST_EMAIL" placeholder="Selecciona un email" />
@@ -107,7 +101,6 @@
         <option value="aflores@raitrai.cl">
         <option value="chernandez@raitrai.cl">
       </datalist>
-
       <label>
         Moneda:
         <input type="text" id="MONEDA" readonly />
@@ -131,9 +124,7 @@
          =========================== -->
     <h2>Cláusulas adicionales</h2>
     <div id="clausulasContainer"></div>
-    <button id="addClause" style="margin-bottom:1rem;">
-      ➕ Agregar cláusula
-    </button>
+    <button id="addClause" style="margin-bottom:1rem;">➕ Agregar cláusula</button>
 
     <!-- Botón para generar y descargar el DOCX -->
     <button onclick="generarContrato()">📄 Descargar Contrato</button>
@@ -145,7 +136,7 @@
        =========================== -->
   <script>
     // —————————————————————————————
-    // Funcionalidad dinámicas de cláusulas
+    // Añadir/Eliminar cláusulas dinámicamente
     // —————————————————————————————
     document.getElementById("addClause").addEventListener("click", () => {
       const cont = document.getElementById("clausulasContainer");
@@ -161,32 +152,27 @@
           Texto cláusula:
           <textarea name="texto" rows="4" placeholder="Redacta la cláusula aquí…"></textarea>
         </label>
-        <button type="button" class="removeClause" style="background:#c0392b; color:#fff; margin-top:0.5rem;">
+        <button type="button" class="removeClause" style="background:#c0392b;color:#fff;margin-top:0.5rem;">
           Eliminar
         </button>
       `;
       cont.appendChild(wrapper);
-      // Botón “Eliminar” quita este bloque
       wrapper.querySelector(".removeClause").onclick = () => wrapper.remove();
     });
 
     // —————————————————————————————
-    // Enviar formulario y descargar DOCX
+    // Función principal: Generar y descargar DOCX
     // —————————————————————————————
     async function generarContrato() {
-      // 1) Recoger valores de todos los campos fijos
       const campos = [
         'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
         'VALOR_PROGRAMA','PAX_MIN','PAX_LIBERADOS',
-        'DEST_EMAIL',
-        'MONEDA','CUOTA_INSCRIPCION','FECHA_INSCRIPCION','FECHA_PAGO_FINAL'
+        'DEST_EMAIL','MONEDA','CUOTA_INSCRIPCION',
+        'FECHA_INSCRIPCION','FECHA_PAGO_FINAL'
       ];
       const data = {};
-      campos.forEach(id => {
-        data[id] = document.getElementById(id).value;
-      });
+      campos.forEach(id => data[id] = document.getElementById(id).value);
 
-      // 2) Recoger cláusulas adicionales
       data.clausulas = Array.from(
         document.querySelectorAll("#clausulasContainer .clausula")
       ).map(div => ({
@@ -194,23 +180,18 @@
         texto:  div.querySelector("textarea[name=texto]").value
       })).filter(c => c.titulo || c.texto);
 
-      // 3) Notificar inicio de proceso
       document.getElementById("estado").textContent = "⏳ Generando contrato…";
-
       try {
-        // 4) Llamada al endpoint serverless
         const res = await fetch("/api/generar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(await res.text());
-
-        // 5) Descargar el DOCX generado
         const blob = await res.blob();
-        const disposition = res.headers.get("Content-Disposition");
-        const filename = disposition
-          ? disposition.match(/filename="?(.+)"?$/)[1]
+        const disp = res.headers.get("Content-Disposition");
+        const filename = disp
+          ? disp.match(/filename="?(.+)"?$/)[1]
           : "Contrato.docx";
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -221,91 +202,60 @@
       } catch (err) {
         alert("Error: " + err.message);
       } finally {
-        // 6) Limpiar mensaje de estado
         document.getElementById("estado").textContent = "";
       }
     }
 
     // —————————————————————————————
-    // PASO 3: CARGAR SHEET COMO CSV con PapaParse
+    // PASO X: CARGAR DATOS DESDE APPS SCRIPT
     // —————————————————————————————
-    window.addEventListener('DOMContentLoaded', () => {
-      // URL de export CSV de tu Google Sheet (debe ser pública)
-      const sheetCsvUrl =
-        'https://docs.google.com/spreadsheets/d/' +
-        '1WR40RDW3tQFQ94YEwXhfXsVYpf4iqVXq33arFQKCOaI' +
-        '/export?format=csv&gid=0';
+    window.addEventListener('DOMContentLoaded', async () => {
+      // URL de tu Web App de Apps Script
+      const sheetURL = 
+        'https://script.google.com/macros/s/' +
+        'AKfycbzrYoEWgavWX2XqKBNxbRqOH5PnbhtpZ51xbFq1vJGpbrKst54LHrYWxPYbrsKcSdmkEQ/' +
+        'exec';
 
-      Papa.parse(sheetCsvUrl, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        error: err => {
-          console.error("Error cargando CSV:", err);
-          document.getElementById('estado').textContent =
-            "❌ No se pudo cargar la hoja. Revisa permisos o URL.";
-        },
-        complete: results => {
-          const rows = results.data;
-          const bList = document.getElementById('businessList');
-          const gList = document.getElementById('grupoList');
+      try {
+        const res   = await fetch(sheetURL);
+        const datos = await res.json();  // Array de objetos con tus columnas
 
-          // 1) Poblar datalists con Número de negocio y Nombre de Grupo
-          rows.forEach(r => {
-            if (r['Número de negocio']) {
-              const opt = document.createElement('option');
-              opt.value = r['Número de negocio'];
-              bList.appendChild(opt);
-            }
-            if (r['Nombre de Grupo']) {
-              const opt = document.createElement('option');
-              opt.value = r['Nombre de Grupo'];
-              gList.appendChild(opt);
-            }
-          });
+        const inNum = document.getElementById('numeroNegocio');
+        const inNom = document.getElementById('nombreGrupo');
+        const dlNum = document.getElementById('businessList');
+        const dlNom = document.getElementById('grupoList');
 
-          // 2) Al seleccionar cualquiera, autocompletar formulario
-          ['numeroNegocio','nombreGrupo'].forEach(id => {
-            document.getElementById(id)
-              .addEventListener('change', e => {
-                const val = e.target.value.trim();
-                const key = id === 'numeroNegocio'
-                  ? 'Número de negocio'
-                  : 'Nombre de Grupo';
-                const row = rows.find(r =>
-                  (r[key]||'').toString().trim() === val
-                );
-                if (row) fillFromRow(row);
-              });
-          });
+        // Poblar datalists
+        datos.forEach(row => {
+          if (row.numeroNegocio) dlNum.appendChild(new Option(row.numeroNegocio, row.numeroNegocio));
+          if (row.nombreGrupo)   dlNom.appendChild(new Option(row.nombreGrupo,   row.nombreGrupo));
+        });
 
-          // 3) Rellenar campos desde la fila seleccionada
-          function fillFromRow(r) {
-            // Extraer colegio/curso/año con regex
-            const text = r['Nombre de Grupo'] || '';
-            const m = text.match(
-              /^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/
-            );
-            if (m) {
-              document.getElementById('COLEGIO').value  = capitalize(m[1]);
-              document.getElementById('CURSO').value    = m[2];
-              document.getElementById('AÑO').value      = m[3];
-            }
-            // Rellenar resto de campos
-            document.getElementById('COMUNA').value        = r['direccion']    || '';
-            const vp = r['valorPrograma'] || '';
-            document.getElementById('MONEDA').value        = vp.includes('USD') ? 'USD' : 'CLP';
-            document.getElementById('VALOR_PROGRAMA').value = vp.replace(/[^\d]/g,'');
-            document.getElementById('PAX_MIN').value       = r['cantidadgrupo'] || '';
-            document.getElementById('PAX_LIBERADOS').value = r['liberados']     || '';
-          }
+        // Al cambiar cualquiera, rellenar el formulario
+        inNum.addEventListener('change', () => fillFromRow(inNum.value));
+        inNom.addEventListener('change', () => fillFromRow(inNom.value));
 
-          // Función auxiliar: capitalizar cada palabra
-          function capitalize(s) {
-            return s.trim().replace(/\b\w/g, c => c.toUpperCase());
-          }
+        function fillFromRow(val) {
+          const fila = datos.find(r =>
+            String(r.numeroNegocio).trim() === String(val).trim() ||
+            String(r.nombreGrupo).trim()   === String(val).trim()
+          );
+          if (!fila) return;
+
+          document.getElementById('COLEGIO').value        = fila.colegio       || '';
+          document.getElementById('CURSO').value          = fila.curso         || '';
+          document.getElementById('AÑO').value            = fila.anoViaje      || '';
+          document.getElementById('COMUNA').value         = fila.direccion     || '';
+          const vp = fila.programa || '';
+          document.getElementById('MONEDA').value         = vp.includes('USD') ? 'USD' : 'CLP';
+          document.getElementById('VALOR_PROGRAMA').value = vp.replace(/[^\d]/g,'');
+          document.getElementById('PAX_MIN').value        = fila.cantidadgrupo || '';
+          document.getElementById('PAX_LIBERADOS').value  = fila.liberados     || '';
         }
-      });
+      } catch (e) {
+        console.error('Error cargando datos de Apps Script:', e);
+        document.getElementById('estado').textContent = '❌ No fue posible cargar los datos.';
+      }
     });
   </script>
 
