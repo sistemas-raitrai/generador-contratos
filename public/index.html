@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Generador de Contratos</title>
-  <!-- === Paso 1: Incluir PapaParse para parsear CSV de Google Sheets === -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- === Ya no usamos PapaParse, pasamos a JSON vía Google Sheets gviz === -->
   <!-- === Enlazamos el CSS === -->
   <link rel="stylesheet" href="/estilos.css" />
   <link rel="icon" type="image/png" href="logo.png" />
@@ -41,7 +40,7 @@
        =========================== -->
   <div class="contenedor">
 
-    <!-- === Paso 2: SELECCIÓN DE GRUPO === -->
+    <!-- === SELECCIÓN DE GRUPO === -->
     <h2>Seleccionar Grupo</h2>
     <label>
       Número de Negocio:
@@ -119,7 +118,9 @@
       ➕ Agregar cláusula
     </button>
 
+    <!-- Botón para generar y descargar el PDF -->
     <button onclick="generarContrato()">📄 Descargar PDF</button>
+    <!-- Área para mostrar estado de procesamiento -->
     <div id="estado" style="margin-top:1rem; font-style:italic; color:#555;"></div>
   </div>
 
@@ -127,7 +128,7 @@
        SCRIPT DE INTERACCIÓN
        =========================== -->
   <script>
-    // Funcionalidad para agregar/eliminar cláusulas
+    // === Función para añadir/eliminar cláusulas ===
     document.getElementById("addClause").addEventListener("click", () => {
       const cont = document.getElementById("clausulasContainer");
       const wrapper = document.createElement("div");
@@ -150,7 +151,7 @@
       wrapper.querySelector(".removeClause").onclick = () => wrapper.remove();
     });
 
-    // Generar y descargar PDF
+    // === Función para generar y descargar el PDF ===
     async function generarContrato() {
       const campos = [
         'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
@@ -192,28 +193,34 @@
       }
     }
 
-    // === PASO 3: CARGAR Y PARSEAR LA SHEET ===
+    // === PASO 3: CARGAR LA SHEET CON JSON GVIZ ===
     window.addEventListener('DOMContentLoaded', () => {
-      // 📌 NUEVO: usamos la URL GViz para exportar CSV público
-      const sheetUrl =
-        'https://docs.google.com/spreadsheets/d/1iofzpqNx87iD_YF8SDXn4TiT5XoSCgfEoQ4LC254scU' +
-        '/gviz/tq?tqx=out:csv&gid=1151545728';
+      // URL pública de tu Google Sheet en modo JSON
+      const sheetJsonUrl =
+        'https://docs.google.com/spreadsheets/d/' +
+        '1iofzpqNx87iD_YF8SDXn4TiT5XoSCgfEoQ4LC254scU/' +
+        'gviz/tq?gid=1151545728&tqx=out:json';
 
-      Papa.parse(sheetUrl, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        // 📌 Manejo de errores de carga
-        error: err => {
-          console.error("Error cargando el CSV:", err);
-          document.getElementById('estado').textContent =
-            "❌ No se pudo cargar la hoja de datos. Revisa permisos o URL.";
-        },
-        complete: results => {
-          const rows = results.data;
+      fetch(sheetJsonUrl)
+        .then(r => r.text())
+        .then(txt => {
+          // Limpiar envoltorio de Google y parsear JSON
+          const jsonText = txt
+            .replace(/^[^\(]*\(/, '')   // quitar hasta primer (
+            .replace(/\);?$/, '');     // quitar ); al final
+          const table = JSON.parse(jsonText).table;
+          const headers = table.cols.map(c => c.label);
+          const rows = table.rows.map(r => {
+            const obj = {};
+            r.c.forEach((cell, i) => {
+              obj[headers[i]] = cell?.v ?? '';
+            });
+            return obj;
+          });
+
+          // Poblar los datalists
           const businessList = document.getElementById('businessList');
           const grupoList   = document.getElementById('grupoList');
-          // Poblar datalists
           rows.forEach(r => {
             if (r['Número de negocio']) {
               const opt = document.createElement('option');
@@ -226,39 +233,48 @@
               grupoList.appendChild(opt);
             }
           });
-          // Al seleccionar, autocompletamos
+
+          // Eventos de selección para autocompletar
           ['numeroNegocio','nombreGrupo'].forEach(id => {
             document.getElementById(id).addEventListener('change', e => {
               const val = e.target.value;
               const key = id === 'numeroNegocio'
                 ? 'Número de negocio'
                 : 'Nombre de Grupo';
-              const row = rows.find(r => r[key] === val);
+              const row = rows.find(r => r[key] + '' === val + '');
               if (row) fillFromRow(row);
             });
           });
+
+          // Función que rellena el formulario a partir de la fila
           function fillFromRow(r) {
-            // Extraer Colegio, Curso, Año con regex
-            const text = r['Nombre de Grupo'];
-            const regex = /^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/;
-            const m = text.match(regex);
+            const text = r['Nombre de Grupo'] || '';
+            const m = text.match(
+              /^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/
+            );
             if (m) {
               document.getElementById('COLEGIO').value  = capitalize(m[1]);
               document.getElementById('CURSO').value    = m[2];
               document.getElementById('AÑO').value      = m[3];
             }
-            document.getElementById('COMUNA').value        = r['direccion'] || '';
+            document.getElementById('COMUNA').value        = r['direccion']    || '';
             const vp = r['valorPrograma'] || '';
             document.getElementById('MONEDA').value        = vp.includes('USD') ? 'USD' : 'CLP';
             document.getElementById('VALOR_PROGRAMA').value = vp.replace(/[^\d]/g, '');
             document.getElementById('PAX_MIN').value       = r['cantidadgrupo'] || '';
-            document.getElementById('PAX_LIBERADOS').value = r['liberados'] || '';
+            document.getElementById('PAX_LIBERADOS').value = r['liberados']     || '';
           }
+
+          // Capitaliza la primera letra de cada palabra
           function capitalize(s) {
             return s.trim().replace(/\b\w/g, c => c.toUpperCase());
           }
-        }
-      });
+        })
+        .catch(err => {
+          console.error('No se pudo leer la sheet:', err);
+          document.getElementById('estado').textContent =
+            '❌ Error cargando datos de la hoja pública.';
+        });
     });
   </script>
 
