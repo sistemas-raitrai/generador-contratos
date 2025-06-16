@@ -2,42 +2,27 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Generador de Contratos</title>
-  <!-- === Estilos === -->
   <link rel="stylesheet" href="/estilos.css" />
   <link rel="icon" type="image/png" href="logo.png" />
 </head>
 <body>
 
-  <!-- ===========================
-       ENCABEZADO CON LOGO Y TÍTULO
-       =========================== -->
-  <div style="
-      background-color: #fff;
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #ccc;
-    ">
-    <div style="display:flex; align-items:center;">
-      <img src="/logo.png" alt="Logo Rai Trai" style="height:60px; margin-right:1rem;">
+  <!-- ENCABEZADO -->
+  <div style="background:#fff;padding:1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ccc;">
+    <div style="display:flex;align-items:center;">
+      <img src="/logo.png" alt="Logo Rai Trai" style="height:60px;margin-right:1rem;">
       <div>
-        <h2 style="margin:0; font-size:1.5rem; color:#2c3e50;">
-          GENERADOR AUTOMÁTICO DE CONTRATOS
-        </h2>
-        <p style="margin:0; font-size:0.9rem;"><strong>Plantilla fija en servidor</strong></p>
+        <h2 style="margin:0;font-size:1.5rem;color:#2c3e50;">GENERADOR AUTOMÁTICO DE CONTRATOS</h2>
+        <p style="margin:0;font-size:0.9rem;"><strong>Plantilla fija en servidor</strong></p>
       </div>
     </div>
   </div>
 
-  <!-- ===========================
-       CONTENEDOR PRINCIPAL
-       =========================== -->
+  <!-- CONTENEDOR PRINCIPAL -->
   <div class="contenedor">
-
-    <!-- === SELECCIÓN DE GRUPO === -->
+    <!-- 1) SELECCIÓN DE GRUPO -->
     <h2>Seleccionar Grupo</h2>
     <label>
       Número de Negocio:
@@ -51,43 +36,19 @@
     </label>
     <datalist id="grupoList"></datalist>
 
-    <!-- ===========================
-         DATOS DEL CONTRATO
-         =========================== -->
+    <!-- 2) DATOS DEL CONTRATO -->
     <h2>Datos del Contrato</h2>
     <div class="grid">
-      <label>
-        Fecha del Contrato:
-        <input type="date" id="FECHA_CONTRATO" />
-      </label>
-      <label>
-        Curso:
-        <input type="text" id="CURSO" placeholder="Ej. 3B" />
-      </label>
-      <label>
-        Año:
-        <input type="number" id="AÑO" placeholder="Ej. 2025" />
-      </label>
-      <label>
-        Colegio:
-        <input type="text" id="COLEGIO" placeholder="Nombre del colegio" />
-      </label>
-      <label>
-        Comuna:
-        <input type="text" id="COMUNA" placeholder="Ej. Providencia" />
-      </label>
-      <label>
-        Valor Programa:
-        <input type="text" id="VALOR_PROGRAMA" placeholder="Ej. 1200" />
-      </label>
-      <label>
-        PAX Mínimos:
-        <input type="number" id="PAX_MIN" placeholder="Ej. 20" />
-      </label>
-      <label>
-        PAX Liberados:
-        <input type="number" id="PAX_LIBERADOS" placeholder="Ej. 2" />
-      </label>
+      <label>Fecha del Contrato:<input type="date" id="FECHA_CONTRATO" /></label>
+      <label>Curso:<input type="text" id="CURSO" placeholder="Ej. 3B" /></label>
+      <label>Año:<input type="number" id="AÑO" placeholder="Ej. 2025" /></label>
+      <label>Colegio:<input type="text" id="COLEGIO" placeholder="Nombre del colegio" /></label>
+      <label>Comuna:<input type="text" id="COMUNA" placeholder="Ej. Providencia" /></label>
+      <label>Valor Programa:<input type="text" id="VALOR_PROGRAMA" placeholder="Ej. 1200" /></label>
+      <label>PAX Mínimos:<input type="number" id="PAX_MIN" placeholder="Ej. 20" /></label>
+      <label>PAX Liberados:<input type="number" id="PAX_LIBERADOS" placeholder="Ej. 2" /></label>
+
+      <!-- Nuevo campo de email -->
       <label>
         Email destinatario:
         <input list="emailList" id="DEST_EMAIL" placeholder="Selecciona un email" />
@@ -101,68 +62,92 @@
         <option value="aflores@raitrai.cl">
         <option value="chernandez@raitrai.cl">
       </datalist>
-      <label>
-        Moneda:
-        <input type="text" id="MONEDA" readonly />
-      </label>
-      <label>
-        Cuota Inscripción:
-        <input type="text" id="CUOTA_INSCRIPCION" placeholder="Ej. 150" />
-      </label>
-      <label>
-        Fecha Inscripción:
-        <input type="date" id="FECHA_INSCRIPCION" />
-      </label>
-      <label>
-        Fecha Pago Final:
-        <input type="date" id="FECHA_PAGO_FINAL" />
-      </label>
+
+      <label>Moneda:<input type="text" id="MONEDA" readonly /></label>
+      <label>Cuota Inscripción:<input type="text" id="CUOTA_INSCRIPCION" placeholder="Ej. 150" /></label>
+      <label>Fecha Inscripción:<input type="date" id="FECHA_INSCRIPCION" /></label>
+      <label>Fecha Pago Final:<input type="date" id="FECHA_PAGO_FINAL" /></label>
     </div>
 
-    <!-- ===========================
-         CLÁUSULAS ADICIONALES
-         =========================== -->
+    <!-- 3) CLÁUSULAS ADICIONALES -->
     <h2>Cláusulas adicionales</h2>
     <div id="clausulasContainer"></div>
     <button id="addClause" style="margin-bottom:1rem;">➕ Agregar cláusula</button>
 
-    <!-- Botón para generar y descargar el DOCX -->
+    <!-- 4) GENERAR -->
     <button onclick="generarContrato()">📄 Descargar Contrato</button>
-    <div id="estado" style="margin-top:1rem; font-style:italic; color:#555;"></div>
+    <div id="estado" style="margin-top:1rem;font-style:italic;color:#c0392b;"></div>
   </div>
 
-  <!-- ===========================
-       SCRIPT DE INTERACCIÓN
-       =========================== -->
   <script>
-    // —————————————————————————————
-    // Añadir/Eliminar cláusulas dinámicamente
-    // —————————————————————————————
+    // URL de tu WebApp de Apps Script (must be "Anyone, even anonymous")
+    const sheetURL = 'https://script.google.com/macros/s/AKfycbzrYoEWgavWX2XqKBNxbRqOH5PnbhtpZ51xbFq1vJGpbrKst54LHrYWxPYbrsKcSdmkEQ/exec';
+
+    // 1) Agregar/Eliminar cláusulas
     document.getElementById("addClause").addEventListener("click", () => {
       const cont = document.getElementById("clausulasContainer");
-      const wrapper = document.createElement("div");
-      wrapper.classList.add("clausula");
-      wrapper.style.marginBottom = "1rem";
-      wrapper.innerHTML = `
-        <label>
-          Título cláusula:
-          <input type="text" name="titulo" placeholder="Ej: Fuerza mayor" />
-        </label>
-        <label>
-          Texto cláusula:
-          <textarea name="texto" rows="4" placeholder="Redacta la cláusula aquí…"></textarea>
-        </label>
-        <button type="button" class="removeClause" style="background:#c0392b;color:#fff;margin-top:0.5rem;">
-          Eliminar
-        </button>
+      const w = document.createElement("div");
+      w.className = "clausula";
+      w.style.marginBottom = "1rem";
+      w.innerHTML = `
+        <label>Título cláusula:<input type="text" name="titulo" placeholder="Ej: Fuerza mayor"/></label>
+        <label>Texto cláusula:<textarea name="texto" rows="4" placeholder="Redacta la cláusula…"></textarea></label>
+        <button type="button" class="removeClause" style="background:#c0392b;color:#fff;">Eliminar</button>
       `;
-      cont.appendChild(wrapper);
-      wrapper.querySelector(".removeClause").onclick = () => wrapper.remove();
+      cont.appendChild(w);
+      w.querySelector(".removeClause").onclick = ()=> w.remove();
     });
 
-    // —————————————————————————————
-    // Función principal: Generar y descargar DOCX
-    // —————————————————————————————
+    // 2) Cargar datos al inicio
+    window.addEventListener("DOMContentLoaded", () => {
+      fetch(sheetURL)
+        .then(r => {
+          if (!r.ok) throw new Error("HTTP "+r.status);
+          return r.json();
+        })
+        .then(rows => {
+          // Poblar datalists
+          const bl = document.getElementById("businessList");
+          const gl = document.getElementById("grupoList");
+          rows.forEach(r => {
+            if (r.numeroNegocio) {
+              const o = document.createElement("option"); o.value = r.numeroNegocio; bl.append(o);
+            }
+            if (r.nombreGrupo) {
+              const o = document.createElement("option"); o.value = r.nombreGrupo; gl.append(o);
+            }
+          });
+          // Al cambiar número o nombre, autocompletar form
+          ["numeroNegocio","nombreGrupo"].forEach(id => {
+            document.getElementById(id).addEventListener("change", e => {
+              const v = e.target.value.trim();
+              const row = rows.find(r =>
+                String(r.numeroNegocio)===v||r.nombreGrupo===v
+              );
+              if (!row) return;
+              // Colegio/Curso/Año desde row.nombreGrupo con regex
+              const m = row.nombreGrupo.match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
+              if (m) {
+                document.getElementById("COLEGIO").value = m[1];
+                document.getElementById("CURSO").value   = m[2];
+                document.getElementById("AÑO").value     = m[3];
+              }
+              document.getElementById("COMUNA").value        = row.direccion||"";
+              const vp = row.valorPrograma||"";
+              document.getElementById("MONEDA").value        = vp.includes("USD")?"USD":"CLP";
+              document.getElementById("VALOR_PROGRAMA").value = vp.replace(/[^\d]/g,"");
+              document.getElementById("PAX_MIN").value       = row.cantidadgrupo||"";
+              document.getElementById("PAX_LIBERADOS").value = row.liberados||"";
+            });
+          });
+        })
+        .catch(err => {
+          console.error("❌ Error leyendo Sheet:", err);
+          document.getElementById("estado").textContent = "❌ No fue posible cargar los datos.";
+        });
+    });
+
+    // 3) Generar y descargar
     async function generarContrato() {
       const campos = [
         'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
@@ -172,92 +157,35 @@
       ];
       const data = {};
       campos.forEach(id => data[id] = document.getElementById(id).value);
-
-      data.clausulas = Array.from(
-        document.querySelectorAll("#clausulasContainer .clausula")
-      ).map(div => ({
+      // cláusulas
+      data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div=>({
         titulo: div.querySelector("input[name=titulo]").value,
         texto:  div.querySelector("textarea[name=texto]").value
-      })).filter(c => c.titulo || c.texto);
+      })).filter(c=>c.titulo||c.texto);
 
       document.getElementById("estado").textContent = "⏳ Generando contrato…";
       try {
         const res = await fetch("/api/generar", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method:"POST", headers:{"Content-Type":"application/json"},
           body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(await res.text());
         const blob = await res.blob();
-        const disp = res.headers.get("Content-Disposition");
-        const filename = disp
-          ? disp.match(/filename="?(.+)"?$/)[1]
-          : "Contrato.docx";
+        const fn = res.headers.get("Content-Disposition")
+                    ?.match(/filename="?(.+)"?$/)?.[1]
+                   || "Contrato.docx";
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = filename;
-        document.body.appendChild(a);
+        a.download = fn;
+        document.body.append(a);
         a.click();
         a.remove();
-      } catch (err) {
-        alert("Error: " + err.message);
+      } catch(err) {
+        alert("Error: "+err.message);
       } finally {
         document.getElementById("estado").textContent = "";
       }
     }
-
-    // —————————————————————————————
-    // PASO X: CARGAR DATOS DESDE APPS SCRIPT
-    // —————————————————————————————
-    window.addEventListener('DOMContentLoaded', async () => {
-      // URL de tu Web App de Apps Script
-      const sheetURL = 
-        'https://script.google.com/macros/s/' +
-        'AKfycbzrYoEWgavWX2XqKBNxbRqOH5PnbhtpZ51xbFq1vJGpbrKst54LHrYWxPYbrsKcSdmkEQ/' +
-        'exec';
-
-      try {
-        const res   = await fetch(sheetURL);
-        const datos = await res.json();  // Array de objetos con tus columnas
-
-        const inNum = document.getElementById('numeroNegocio');
-        const inNom = document.getElementById('nombreGrupo');
-        const dlNum = document.getElementById('businessList');
-        const dlNom = document.getElementById('grupoList');
-
-        // Poblar datalists
-        datos.forEach(row => {
-          if (row.numeroNegocio) dlNum.appendChild(new Option(row.numeroNegocio, row.numeroNegocio));
-          if (row.nombreGrupo)   dlNom.appendChild(new Option(row.nombreGrupo,   row.nombreGrupo));
-        });
-
-        // Al cambiar cualquiera, rellenar el formulario
-        inNum.addEventListener('change', () => fillFromRow(inNum.value));
-        inNom.addEventListener('change', () => fillFromRow(inNom.value));
-
-        function fillFromRow(val) {
-          const fila = datos.find(r =>
-            String(r.numeroNegocio).trim() === String(val).trim() ||
-            String(r.nombreGrupo).trim()   === String(val).trim()
-          );
-          if (!fila) return;
-
-          document.getElementById('COLEGIO').value        = fila.colegio       || '';
-          document.getElementById('CURSO').value          = fila.curso         || '';
-          document.getElementById('AÑO').value            = fila.anoViaje      || '';
-          document.getElementById('COMUNA').value         = fila.direccion     || '';
-          const vp = fila.programa || '';
-          document.getElementById('MONEDA').value         = vp.includes('USD') ? 'USD' : 'CLP';
-          document.getElementById('VALOR_PROGRAMA').value = vp.replace(/[^\d]/g,'');
-          document.getElementById('PAX_MIN').value        = fila.cantidadgrupo || '';
-          document.getElementById('PAX_LIBERADOS').value  = fila.liberados     || '';
-        }
-      } catch (e) {
-        console.error('Error cargando datos de Apps Script:', e);
-        document.getElementById('estado').textContent = '❌ No fue posible cargar los datos.';
-      }
-    });
   </script>
-
 </body>
 </html>
