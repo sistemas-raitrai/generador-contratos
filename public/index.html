@@ -5,37 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Generador de Contratos</title>
   <link rel="stylesheet" href="/estilos.css" />
-  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="icon" href="/logo.png" />
 </head>
 <body>
 
-  <!-- ===========================
-       ENCABEZADO
-       =========================== -->
-  <div style="
-      background: #fff;
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #ccc;
-    ">
-    <div style="display:flex; align-items:center;">
-      <img src="/logo.png" alt="Logo Rai Trai" style="height:60px; margin-right:1rem;">
+  <!-- ENCABEZADO -->
+  <div style="background:#fff;padding:1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ccc;">
+    <div style="display:flex;align-items:center;">
+      <img src="/logo.png" alt="Logo Rai Trai" style="height:60px;margin-right:1rem;">
       <div>
-        <h2 style="margin:0; font-size:1.5rem; color:#2c3e50;">
-          GENERADOR AUTOMÁTICO DE CONTRATOS
-        </h2>
-        <p style="margin:0; font-size:0.9rem;">
-          <strong>Plantilla fija en servidor</strong>
-        </p>
+        <h2 style="margin:0;font-size:1.5rem;color:#2c3e50;">GENERADOR AUTOMÁTICO DE CONTRATOS</h2>
+        <p style="margin:0;font-size:0.9rem;"><strong>Plantilla fija en servidor</strong></p>
       </div>
     </div>
   </div>
 
-  <!-- ===========================
-       CONTENEDOR PRINCIPAL
-       =========================== -->
+  <!-- CONTENEDOR PRINCIPAL -->
   <div class="contenedor">
 
     <!-- 1) SELECCIÓN DE GRUPO -->
@@ -65,8 +50,7 @@
       <label>PAX Liberados:<input type="number" id="PAX_LIBERADOS" placeholder="Ej. 2" /></label>
 
       <!-- Nuevo campo de email -->
-      <label>
-        Email destinatario:
+      <label>Email destinatario:
         <input list="emailList" id="DEST_EMAIL" placeholder="Selecciona un email" />
       </label>
       <datalist id="emailList">
@@ -92,20 +76,18 @@
 
     <!-- 4) GENERAR -->
     <button onclick="generarContrato()">📄 Descargar Contrato</button>
-    <div id="estado" style="margin-top:1rem; font-style:italic; color:#c0392b;"></div>
+    <div id="estado" style="margin-top:1rem;font-style:italic;color:#c0392b;"></div>
   </div>
 
   <script>
-    // ——————————————————————————————————————————
-    //  URL de tu Web App de Apps Script (debe estar
-    //  desplegado como "Cualquiera, incluso anónimo")
-    // ——————————————————————————————————————————
+    // ——————————————
+    // 📌 URL de tu Web App de Apps Script (CORS habilitado)
+    // ID de implementación: AKfycbz3hqiMso4WDmHf-L_pWumNenIR9m-7appsl5-SsL3I28QD71weJHZNL4i4l8Jo7lJEBg
+    // ——————————————
     const sheetURL = 
-      'https://script.google.com/macros/s/AKfycbzrYoEWgavWX2XqKBNxbRqOH5PnbhtpZ51xbFq1vJGpbrKst54LHrYWxPYbrsKcSdmkEQ/exec';
+      'https://script.google.com/macros/s/AKfycbz3hqiMso4WDmHf-L_pWumNenIR9m-7appsl5-SsL3I28QD71weJHZNL4i4l8Jo7lJEBg/exec';
 
-    // ——————————————————————————————————————————
-    //  1) Función para añadir/eliminar cláusulas
-    // ——————————————————————————————————————————
+    // 1) Añadir / eliminar cláusulas dinámicamente
     document.getElementById("addClause").addEventListener("click", () => {
       const cont = document.getElementById("clausulasContainer");
       const w = document.createElement("div");
@@ -120,9 +102,7 @@
       w.querySelector(".removeClause").onclick = ()=> w.remove();
     });
 
-    // ——————————————————————————————————————————
-    //  2) Cargar datos de la hoja al inicio y poblar listas
-    // ——————————————————————————————————————————
+    // 2) Al cargar la página, traer y parsear tu sheet JSON
     window.addEventListener("DOMContentLoaded", () => {
       fetch(sheetURL)
         .then(r => {
@@ -132,60 +112,44 @@
         .then(rows => {
           const bl = document.getElementById("businessList");
           const gl = document.getElementById("grupoList");
-
-          // 2.a) Poblar datalists
           rows.forEach(r => {
-            if (r["Número de negocio"]) {
-              const o = document.createElement("option");
-              o.value = r["Número de negocio"];
-              bl.append(o);
-            }
-            if (r["Nombre de Grupo"]) {
-              const o = document.createElement("option");
-              o.value = r["Nombre de Grupo"];
-              gl.append(o);
-            }
+            if (r.numeroNegocio) bl.append(new Option(r.numeroNegocio, r.numeroNegocio));
+            if (r.nombreGrupo)  gl.append(new Option(r.nombreGrupo,  r.nombreGrupo));
           });
 
-          // 2.b) Al cambiar número o nombre → autocompletar el formulario
+          // Auto-completar al cambiar número o nombre
           ["numeroNegocio","nombreGrupo"].forEach(id => {
             document.getElementById(id).addEventListener("change", e => {
               const v = e.target.value.trim();
               const row = rows.find(r =>
-                String(r["Número de negocio"]) === v ||
-                r["Nombre de Grupo"] === v
+                String(r.numeroNegocio) === v || r.nombreGrupo === v
               );
               if (!row) return;
-
-              // Extraer Colegio/Curso/Año de "Nombre de Grupo"
-              const m = row["Nombre de Grupo"]
-                .match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
+              // Extraer Colegio/Curso/Año
+              const m = row.nombreGrupo.match(
+                /^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/
+              );
               if (m) {
                 document.getElementById("COLEGIO").value = m[1];
                 document.getElementById("CURSO").value   = m[2];
                 document.getElementById("AÑO").value     = m[3];
               }
-
-              // Resto de campos
-              document.getElementById("COMUNA").value        = row["direccion"]         || "";
-              const vp = row["valorPrograma"] || "";
+              document.getElementById("COMUNA").value        = row.direccion || "";
+              const vp = row.valorPrograma || "";
               document.getElementById("MONEDA").value        = vp.includes("USD") ? "USD" : "CLP";
-              document.getElementById("VALOR_PROGRAMA").value = vp.replace(/[^\d]/g, "");
-              document.getElementById("PAX_MIN").value       = row["cantidadgrupo"]    || "";
-              document.getElementById("PAX_LIBERADOS").value = row["liberados"]        || "";
+              document.getElementById("VALOR_PROGRAMA").value = vp.replace(/[^\d]/g,"");
+              document.getElementById("PAX_MIN").value       = row.cantidadgrupo || "";
+              document.getElementById("PAX_LIBERADOS").value = row.liberados || "";
             });
           });
         })
         .catch(err => {
-          console.error("❌ Error leyendo Sheet:", err);
-          document.getElementById("estado").textContent =
-            "❌ No fue posible cargar los datos.";
+          console.error("❌ Error leyendo Sheet JSON:", err);
+          document.getElementById("estado").textContent = "❌ No fue posible cargar los datos.";
         });
     });
 
-    // ——————————————————————————————————————————
-    //  3) Generar & descargar (y enviar al backend)
-    // ——————————————————————————————————————————
+    // 3) Generar y descargar el contrato
     async function generarContrato() {
       const campos = [
         'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
@@ -195,30 +159,22 @@
       ];
       const data = {};
       campos.forEach(id => data[id] = document.getElementById(id).value);
-
-      // Adjuntar cláusulas adicionales
-      data.clausulas = Array.from(
-        document.querySelectorAll(".clausula")
-      ).map(div => ({
+      data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div=>({
         titulo: div.querySelector("input[name=titulo]").value,
         texto:  div.querySelector("textarea[name=texto]").value
-      })).filter(c => c.titulo || c.texto);
+      })).filter(c=>c.titulo||c.texto);
 
       document.getElementById("estado").textContent = "⏳ Generando contrato…";
-
       try {
         const res = await fetch("/api/generar", {
-          method: "POST",
-          headers: { "Content-Type":"application/json" },
+          method:"POST", headers:{"Content-Type":"application/json"},
           body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(await res.text());
-
-        // Forzar descarga del DOCX que devuelve el API
         const blob = await res.blob();
         const fn = res.headers.get("Content-Disposition")
-                     ?.match(/filename="?(.+)"?$/)?.[1]
-                   ?? "Contrato.docx";
+                    ?.match(/filename="?(.+)"?$/)?.[1]
+                   || "Contrato.docx";
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = fn;
@@ -232,6 +188,5 @@
       }
     }
   </script>
-
 </body>
 </html>
