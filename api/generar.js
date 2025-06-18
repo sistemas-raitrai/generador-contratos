@@ -26,7 +26,8 @@ export default async function handler(req, res) {
     const docxBuffer = docx.asBlob(html);
 
     // 4. Enviar el archivo
-    res.setHeader('Content-Disposition', 'attachment; filename=Contrato_RaiTrai.docx');
+    const filename = `Contrato_${req.body.CURSO}_${req.body.COLEGIO}_${req.body.AÑO} - RAITRAI.docx`;
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     res.send(Buffer.from(await docxBuffer.arrayBuffer()));
   } catch (error) {
