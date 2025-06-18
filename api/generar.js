@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
   try {
     // 1) Leer plantilla
-    const tpl = path.join(__dirname, "..", "templates", "contract-template.docx");
+    const tpl = path.join(__dirname, "..", "templates", "contract-template-v2.docx");
     const content = fs.readFileSync(tpl, "binary");
     const zip = new PizZip(content);
     const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
