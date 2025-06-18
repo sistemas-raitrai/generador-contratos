@@ -1,76 +1,36 @@
-// api/generar.js
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import PizZip from "pizzip";
-import pkg from "docxtemplater";
-const { default: Docxtemplater, Errors } = pkg;
-import nodemailer from "nodemailer";
+import fs from 'fs';
+import path from 'path';
+import docx from 'html-docx-js';
+import { promisify } from 'util';
 
-// __dirname en ES module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
-
-// Transporter SMTP (variables en Vercel)
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
+const readFile = promisify(fs.readFile);
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Método no permitido' });
+  }
 
   try {
-    // 1) Leer plantilla
-    const tpl = path.join(__dirname, "..", "templates", "test-contrato.docx");
-    const content = fs.readFileSync(tpl, "binary");
-    const zip = new PizZip(content);
-    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    // 1. Cargar el template HTML
+    const templatePath = path.join(process.cwd(), 'templates', 'contrato-template.html');
+    let html = await readFile(templatePath, 'utf8');
 
-    // 🛑 Opción para lanzar error si falta algún dato
-    doc.setOptions({
-      nullGetter: (part) => {
-        throw new Error(`⚠️ Faltó ingresar el dato: ${part}`);
-      }
-    });
-
-    // 📩 Set de datos y render
-    doc.setData(req.body);
-    doc.render();
-
-    // 2) Buffer DOCX
-    const buf = doc.getZip().generate({ type: "nodebuffer" });
-    const filename = `Contrato_${req.body.CURSO}_${req.body.AÑO}.docx`;
-
-    // 3) Envío por correo
-    try {
-      await transporter.sendMail({
-        from: `"RaiTrai" <${process.env.SMTP_USER}>`,
-        to: [ req.body.DEST_EMAIL, "administracion@raitrai.cl" ],
-        subject: `Contrato ${req.body.CURSO} ${req.body.AÑO}`,
-        text:    "Adjunto encontrarás el contrato en formato DOCX.",
-        attachments: [{ filename, content: buf }]
-      });
-    } catch (mailErr) {
-      console.warn("⚠️ No se pudo enviar email:", mailErr.message);
+    // 2. Reemplazar variables del HTML con valores del body
+    const datos = req.body;
+    for (const key in datos) {
+      const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+      html = html.replace(regex, datos[key]);
     }
 
-    // 4) Descargar archivo
-    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-    res.send(buf);
+    // 3. Convertir HTML a DOCX
+    const docxBuffer = docx.asBlob(html);
 
-  } catch (err) {
-    if (err instanceof Errors.XTTemplateError) {
-      console.error("❌ TemplateError:", err.explanation);
-    } else {
-      console.error("Error en /api/generar:", err);
-    }
-    res.status(500).send("Error generando el contrato");
+    // 4. Enviar el archivo
+    res.setHeader('Content-Disposition', 'attachment; filename=Contrato_RaiTrai.docx');
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    res.send(Buffer.from(await docxBuffer.arrayBuffer()));
+  } catch (error) {
+    console.error('Error al generar contrato:', error);
+    res.status(500).json({ error: 'Error al generar el contrato' });
   }
 }
