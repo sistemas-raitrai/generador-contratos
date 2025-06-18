@@ -1,11 +1,11 @@
 // api/generar.js
-import fs   from "fs";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import PizZip         from "pizzip";
-import Docxtemplater  from "docxtemplater";
-import { Errors }     from "docxtemplater";
-import nodemailer     from "nodemailer";
+import PizZip from "pizzip";
+import pkg from "docxtemplater";
+const { default: Docxtemplater, Errors } = pkg;
+import nodemailer from "nodemailer";
 
 // __dirname en ES module
 const __filename = fileURLToPath(import.meta.url);
