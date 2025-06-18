@@ -49,7 +49,6 @@
       <label>PAX Mínimos:<input type="number" id="PAX_MIN" placeholder="Ej. 20" /></label>
       <label>PAX Liberados:<input type="number" id="PAX_LIBERADOS" placeholder="Ej. 2" /></label>
 
-      <!-- Nuevo campo de email -->
       <label>Email destinatario:
         <input list="emailList" id="DEST_EMAIL" placeholder="Selecciona un email" />
       </label>
@@ -80,14 +79,10 @@
   </div>
 
   <script>
-    // ——————————————
-    // 📌 URL de tu Web App de Apps Script (CORS habilitado)
-    // ID de implementación: AKfycbz3hqiMso4WDmHf-L_pWumNenIR9m-7appsl5-SsL3I28QD71weJHZNL4i4l8Jo7lJEBg
-    // ——————————————
-    const sheetURL = 
-      'https://script.google.com/macros/s/AKfycbz3hqiMso4WDmHf-L_pWumNenIR9m-7appsl5-SsL3I28QD71weJHZNL4i4l8Jo7lJEBg/exec';
+    // ✅ URL CORRECTA DEL SCRIPT QUE LEE LA HOJA "Datos"
+    const sheetURL = 'https://script.google.com/macros/s/AKfycbzU3RIF2TXDhlUwuSZj9VFnEienz0_XPw1mVwqzj6TWL3afs4GE-9kFkaRy9ps5YSqFaQ/exec';
 
-    // 1) Añadir / eliminar cláusulas dinámicamente
+    // 1) Añadir cláusulas
     document.getElementById("addClause").addEventListener("click", () => {
       const cont = document.getElementById("clausulasContainer");
       const w = document.createElement("div");
@@ -99,10 +94,10 @@
         <button type="button" class="removeClause" style="background:#c0392b;color:#fff;">Eliminar</button>
       `;
       cont.appendChild(w);
-      w.querySelector(".removeClause").onclick = ()=> w.remove();
+      w.querySelector(".removeClause").onclick = () => w.remove();
     });
 
-    // 2) Al cargar la página, traer y parsear tu sheet JSON
+    // 2) Cargar datos del Sheet al iniciar
     window.addEventListener("DOMContentLoaded", () => {
       fetch(sheetURL)
         .then(r => {
@@ -117,7 +112,7 @@
             if (r.nombreGrupo)  gl.append(new Option(r.nombreGrupo,  r.nombreGrupo));
           });
 
-          // Auto-completar al cambiar número o nombre
+          // Autocompletar al seleccionar número o grupo
           ["numeroNegocio","nombreGrupo"].forEach(id => {
             document.getElementById(id).addEventListener("change", e => {
               const v = e.target.value.trim();
@@ -125,15 +120,15 @@
                 String(r.numeroNegocio) === v || r.nombreGrupo === v
               );
               if (!row) return;
-              // Extraer Colegio/Curso/Año
-              const m = row.nombreGrupo.match(
-                /^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/
-              );
+
+              // Parsear nombreGrupo para extraer COLEGIO, CURSO, AÑO
+              const m = row.nombreGrupo.match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
               if (m) {
                 document.getElementById("COLEGIO").value = m[1];
                 document.getElementById("CURSO").value   = m[2];
                 document.getElementById("AÑO").value     = m[3];
               }
+
               document.getElementById("COMUNA").value        = row.direccion || "";
               const vp = row.valorPrograma || "";
               document.getElementById("MONEDA").value        = vp.includes("USD") ? "USD" : "CLP";
@@ -149,7 +144,7 @@
         });
     });
 
-    // 3) Generar y descargar el contrato
+    // 3) Generar contrato (envío a /api/generar)
     async function generarContrato() {
       const campos = [
         'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
@@ -159,30 +154,30 @@
       ];
       const data = {};
       campos.forEach(id => data[id] = document.getElementById(id).value);
-      data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div=>({
+      data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div => ({
         titulo: div.querySelector("input[name=titulo]").value,
         texto:  div.querySelector("textarea[name=texto]").value
-      })).filter(c=>c.titulo||c.texto);
+      })).filter(c => c.titulo || c.texto);
 
       document.getElementById("estado").textContent = "⏳ Generando contrato…";
+
       try {
         const res = await fetch("/api/generar", {
-          method:"POST", headers:{"Content-Type":"application/json"},
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(await res.text());
         const blob = await res.blob();
-        const fn = res.headers.get("Content-Disposition")
-                    ?.match(/filename="?(.+)"?$/)?.[1]
-                   || "Contrato.docx";
+        const fn = res.headers.get("Content-Disposition")?.match(/filename="?(.+)"?$/)?.[1] || "Contrato.docx";
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = fn;
         document.body.append(a);
         a.click();
         a.remove();
-      } catch(err) {
-        alert("Error: "+err.message);
+      } catch (err) {
+        alert("Error: " + err.message);
       } finally {
         document.getElementById("estado").textContent = "";
       }
