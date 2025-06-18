@@ -66,6 +66,19 @@
       <label>Cuota Inscripción:<input type="text" id="CUOTA_INSCRIPCION" placeholder="Ej. 150" /></label>
       <label>Fecha Inscripción:<input type="date" id="FECHA_INSCRIPCION" /></label>
       <label>Fecha Pago Final:<input type="date" id="FECHA_PAGO_FINAL" /></label>
+
+      <!-- CAMPOS ADICIONALES -->
+      <label>Número de Cuotas:<input type="number" id="NUM_CUOTAS" /></label>
+      <label>Valor de Cuota Mensual:<input type="text" id="MONEDA_CUOTA_MENSUAL" /></label>
+      <label>Mes Inicio Pago:<input type="text" id="MES_INICIO_PAGO" /></label>
+      <label>Año Inicio Pago:<input type="number" id="ANO_INICIO_PAGO" /></label>
+      <label>Mes Fin Pago:<input type="text" id="MES_FIN_PAGO" /></label>
+      <label>Año Fin Pago:<input type="number" id="ANO_FIN_PAGO" /></label>
+      <label>Día de Pago Mensual:<input type="number" id="DIA_PAGO_MENSUAL" /></label>
+      <label>Fecha Última Cuota:<input type="date" id="FECHA_ULTIMA_CUOTA" /></label>
+      <label>Fecha Corte Contrato:<input type="date" id="FECHA_CORTE_CONTRATO" /></label>
+      <label>Mes del Viaje:<input type="text" id="MES_VIAJE" /></label>
+      <label>Lugar de Salida:<input type="text" id="LUGAR_SALIDA" /></label>
     </div>
 
     <!-- 3) CLÁUSULAS ADICIONALES -->
@@ -79,10 +92,8 @@
   </div>
 
   <script>
-    // ✅ URL CORRECTA DEL SCRIPT QUE LEE LA HOJA "Datos"
     const sheetURL = 'https://script.google.com/macros/s/AKfycbzU3RIF2TXDhlUwuSZj9VFnEienz0_XPw1mVwqzj6TWL3afs4GE-9kFkaRy9ps5YSqFaQ/exec';
 
-    // 1) Añadir cláusulas
     document.getElementById("addClause").addEventListener("click", () => {
       const cont = document.getElementById("clausulasContainer");
       const w = document.createElement("div");
@@ -97,7 +108,6 @@
       w.querySelector(".removeClause").onclick = () => w.remove();
     });
 
-    // 2) Cargar datos del Sheet al iniciar
     window.addEventListener("DOMContentLoaded", () => {
       fetch(sheetURL)
         .then(r => {
@@ -112,7 +122,6 @@
             if (r.nombreGrupo)  gl.append(new Option(r.nombreGrupo,  r.nombreGrupo));
           });
 
-          // Autocompletar al seleccionar número o grupo
           ["numeroNegocio","nombreGrupo"].forEach(id => {
             document.getElementById(id).addEventListener("change", e => {
               const v = e.target.value.trim();
@@ -121,7 +130,6 @@
               );
               if (!row) return;
 
-              // Parsear nombreGrupo para extraer COLEGIO, CURSO, AÑO
               const m = row.nombreGrupo.match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
               if (m) {
                 document.getElementById("COLEGIO").value = m[1];
@@ -144,17 +152,20 @@
         });
     });
 
-    // 3) Generar contrato (envío a /api/generar)
     async function generarContrato() {
       const campos = [
         'numeroNegocio',
         'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
         'VALOR_PROGRAMA','PAX_MIN','PAX_LIBERADOS',
         'DEST_EMAIL','MONEDA','CUOTA_INSCRIPCION',
-        'FECHA_INSCRIPCION','FECHA_PAGO_FINAL'
+        'FECHA_INSCRIPCION','FECHA_PAGO_FINAL',
+        'NUM_CUOTAS','MONEDA_CUOTA_MENSUAL','MES_INICIO_PAGO','ANO_INICIO_PAGO',
+        'MES_FIN_PAGO','ANO_FIN_PAGO','DIA_PAGO_MENSUAL','FECHA_ULTIMA_CUOTA',
+        'FECHA_CORTE_CONTRATO','MES_VIAJE','LUGAR_SALIDA'
       ];
+
       const data = {};
-      campos.forEach(id => data[id] = document.getElementById(id).value);
+      campos.forEach(id => data[id] = document.getElementById(id)?.value || "");
       data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div => ({
         titulo: div.querySelector("input[name=titulo]").value,
         texto:  div.querySelector("textarea[name=texto]").value
