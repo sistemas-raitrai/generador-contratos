@@ -62,7 +62,13 @@
         <option value="chernandez@raitrai.cl">
       </datalist>
 
-      <label>Moneda:<input type="text" id="MONEDA" readonly /></label>
+      <label>Moneda:
+        <select id="MONEDA">
+          <option value="">Selecciona moneda</option>
+          <option value="$USD">$USD</option>
+          <option value="$CLP">$CLP</option>
+        </select>
+      </label>
       <label>Cuota Inscripción:<input type="text" id="CUOTA_INSCRIPCION" placeholder="Ej. 150" /></label>
       <label>Fecha Inscripción:<input type="date" id="FECHA_INSCRIPCION" /></label>
       <label>Fecha Pago Final:<input type="date" id="FECHA_PAGO_FINAL" /></label>
@@ -138,9 +144,7 @@
               }
 
               document.getElementById("COMUNA").value        = row.direccion || "";
-              const vp = row.valorPrograma || "";
-              document.getElementById("MONEDA").value        = vp.includes("USD") ? "USD" : "CLP";
-              document.getElementById("VALOR_PROGRAMA").value = vp.replace(/[^\d]/g,"");
+              document.getElementById("VALOR_PROGRAMA").value = String(row.valorPrograma || "").replace(/[^\d]/g,"");
               document.getElementById("PAX_MIN").value       = row.cantidadgrupo || "";
               document.getElementById("PAX_LIBERADOS").value = row.liberados || "";
             });
@@ -151,7 +155,7 @@
           document.getElementById("estado").textContent = "❌ No fue posible cargar los datos.";
         });
     });
-
+    
     async function generarContrato() {
       const campos = [
         'numeroNegocio',
@@ -163,16 +167,31 @@
         'MES_FIN_PAGO','ANO_FIN_PAGO','DIA_PAGO_MENSUAL','FECHA_ULTIMA_CUOTA',
         'FECHA_CORTE_CONTRATO','MES_VIAJE','LUGAR_SALIDA'
       ];
-
+    
       const data = {};
       campos.forEach(id => data[id] = document.getElementById(id)?.value || "");
+    
+      // Alias para reemplazos múltiples en Word
+      data.AÑO1 = data.AÑO;
+      data.MONEDA1 = data.MONEDA;
+      data.MONEDA2 = data.MONEDA;
+      data.MONEDA3 = data.MONEDA;
+      data.MONEDA4 = data.MONEDA;
+      data.MONEDA5 = data.MONEDA;
+      data.VALOR_PROGRAMA1 = data.VALOR_PROGRAMA;
+      data.CUOTA_INSCRIPCION1 = data.CUOTA_INSCRIPCION;
+      data.CUOTA_INSCRIPCION2 = data.CUOTA_INSCRIPCION;
+      data.CUOTA_INSCRIPCION3 = data.CUOTA_INSCRIPCION;
+      data.FECHA_MAX_INSCRIPCION = data.FECHA_INSCRIPCION;
+      data.FECHA_MAX_INSCRIPCION1 = data.FECHA_INSCRIPCION;
+    
       data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div => ({
         titulo: div.querySelector("input[name=titulo]").value,
         texto:  div.querySelector("textarea[name=texto]").value
       })).filter(c => c.titulo || c.texto);
-
+    
       document.getElementById("estado").textContent = "⏳ Generando contrato…";
-
+    
       try {
         const res = await fetch("/api/generar", {
           method: "POST",
