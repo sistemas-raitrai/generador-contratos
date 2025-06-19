@@ -3,10 +3,9 @@ import path from 'path';
 import docx from 'html-docx-js';
 import { promisify } from 'util';
 import { Resend } from 'resend';
-import fetch from 'node-fetch';
 
 const readFile = promisify(fs.readFile);
-const resend = new Resend(process.env.RESEND_API_KEY); // asegúrate de definir esta key en Vercel
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -14,60 +13,56 @@ export default async function handler(req, res) {
   }
 
   try {
-    const datos = req.body;
-
-    // 1. Leer HTML plantilla
+    // 1. Leer plantilla HTML
     const templatePath = path.join(process.cwd(), 'templates', 'contrato-template.html');
     let html = await readFile(templatePath, 'utf8');
 
+    // 2. Reemplazar variables {{ }} por datos del body
+    const datos = req.body;
     for (const key in datos) {
       const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
       html = html.replace(regex, datos[key]);
     }
 
-    // 2. Generar DOCX
+    // 3. Convertir HTML a DOCX
     const docxBuffer = await docx.asBlob(html);
-    const bufferFinal = Buffer.from(await docxBuffer.arrayBuffer());
+    const arrayBuffer = await docxBuffer.arrayBuffer();
+    const bufferFinal = Buffer.from(arrayBuffer);
 
-    // 3. Leer datos de la fila desde la misma Google Sheet
-    const sheetURL = 'https://script.google.com/macros/s/AKfycbzU3RIF2TXDhlUwuSZj9VFnEienz0_XPw1mVwqzj6TWL3afs4GE-9kFkaRy9ps5YSqFaQ/exec';
-    let fila = null;
-    try {
-      const respuesta = await fetch(sheetURL);
-      const datosSheet = await respuesta.json();
-      fila = datosSheet.find(
-        (row) =>
-          row.numeroNegocio === datos.numeroNegocio ||
-          row.nombreGrupo === datos.nombreGrupo
-      );
-    } catch (error) {
-      console.warn('⚠️ No se pudo leer la fila desde la Google Sheet:', error.message);
-    }
+    // 4. Nombre del archivo
+    const filename = `Contrato ${req.body.CURSO} ${req.body.COLEGIO} ${req.body.AÑO} - RaiTrai.docx`;
 
-    // 4. Texto del correo
-    const textoCorreo = fila
-      ? `Estimado/a:\n\nAdjuntamos el contrato correspondiente al grupo "${fila.nombreGrupo}", programado para el año ${fila.anoViaje}. En la ficha el campo de autorización dice "${fila.autorizacion}" y el campo descuento "${fila.descuento}".\n\nPara cualquier duda, estamos atentos.\n\nSaludos,\nEquipo RaiTrai`
-      : `Adjuntamos el contrato correspondiente al grupo solicitado.`;
+    // 5. Armar el cuerpo del correo
+    const textoCorreo = `Estimado/a:
 
-    // 5. Enviar por correo
-    const filename = `Contrato ${datos.CURSO} ${datos.COLEGIO} ${datos.AÑO} - RaiTrai.docx`;
+Adjuntamos el contrato correspondiente al grupo "${req.body.nombreGrupo}", programado para el año ${req.body.AÑO}. 
+En la ficha, el campo de autorización dice "${req.body.AUTORIZACION}" y el campo descuento "${req.body.DESCUENTO}".
+
+Para cualquier duda, estamos atentos.
+
+Saludos,
+Equipo RaiTrai`;
+
+    // 6. Enviar email con Resend
     await resend.emails.send({
-      from: 'RaiTrai Contratos <no-responder@raitrai.cl>',
-      to: [datos.DEST_EMAIL, 'administracion@raitrai.cl'],
-      subject: `Contrato ${datos.CURSO} ${datos.COLEGIO} ${datos.AÑO}`,
+      from: 'RaiTrai <onboarding@resend.dev>',
+      to: [req.body.DEST_EMAIL, 'administracion@raitrai.cl'],
+      subject: `Contrato ${req.body.CURSO} ${req.body.COLEGIO} ${req.body.AÑO}`,
       text: textoCorreo,
       attachments: [
         {
-          filename,
+          filename: filename,
           content: bufferFinal.toString('base64'),
-        },
-      ],
+          encoding: 'base64'
+        }
+      ]
     });
 
-    // 6. Enviar como descarga
+    // 7. Descargar el archivo
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     res.send(bufferFinal);
+
   } catch (error) {
     console.error('❌ Error al generar contrato:', error);
     res.status(500).json({ error: 'Error al generar el contrato' });
