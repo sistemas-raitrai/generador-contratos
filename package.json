@@ -6,7 +6,7 @@
     "pizzip": "^3.1.1",
     "docxtemplater": "^3.29.0",
     "nodemailer": "^6.9.1",
-    "resend": "^0.20.0",
+    "resend": "^0.10.0",
     "html-docx-js": "0.3.1"
   }
 }
