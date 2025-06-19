@@ -44,6 +44,9 @@ Saludos,
 Equipo RaiTrai`;
 
     // 6. Enviar email con Resend
+    console.log("🔍 Resend instancia:", resend);
+    console.log("📬 Resend.emails:", resend.emails);
+    
     await resend.emails.send({
       from: 'RaiTrai <onboarding@resend.dev>',
       to: [req.body.DEST_EMAIL, 'administracion@raitrai.cl'],
