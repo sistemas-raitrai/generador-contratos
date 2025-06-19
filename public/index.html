@@ -8,7 +8,6 @@
   <link rel="icon" href="/logo.png" />
 </head>
 <body>
-
   <!-- ENCABEZADO -->
   <div style="background:#fff;padding:1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ccc;">
     <div style="display:flex;align-items:center;">
@@ -22,17 +21,14 @@
 
   <!-- CONTENEDOR PRINCIPAL -->
   <div class="contenedor">
-
     <!-- 1) SELECCIÓN DE GRUPO -->
     <h2>Seleccionar Grupo</h2>
-    <label>
-      Número de Negocio:
+    <label>Número de Negocio:
       <input list="businessList" id="numeroNegocio" placeholder="Buscar..." />
     </label>
     <datalist id="businessList"></datalist>
 
-    <label>
-      Nombre de Grupo:
+    <label>Nombre de Grupo:
       <input list="grupoList" id="nombreGrupo" placeholder="Buscar..." />
     </label>
     <datalist id="grupoList"></datalist>
@@ -41,16 +37,15 @@
     <h2>Datos del Contrato</h2>
     <div class="grid">
       <label>Fecha del Contrato:<input type="date" id="FECHA_CONTRATO" /></label>
-      <label>Curso:<input type="text" id="CURSO" placeholder="Ej. 3B" /></label>
-      <label>Año:<input type="number" id="AÑO" placeholder="Ej. 2025" /></label>
-      <label>Colegio:<input type="text" id="COLEGIO" placeholder="Nombre del colegio" /></label>
-      <label>Comuna:<input type="text" id="COMUNA" placeholder="Ej. Providencia" /></label>
-      <label>Valor Programa:<input type="text" id="VALOR_PROGRAMA" placeholder="Ej. 1200" /></label>
-      <label>PAX Mínimos:<input type="number" id="PAX_MIN" placeholder="Ej. 20" /></label>
-      <label>PAX Liberados:<input type="number" id="PAX_LIBERADOS" placeholder="Ej. 2" /></label>
-
+      <label>Curso:<input type="text" id="CURSO" /></label>
+      <label>Año:<input type="number" id="AÑO" /></label>
+      <label>Colegio:<input type="text" id="COLEGIO" /></label>
+      <label>Comuna:<input type="text" id="COMUNA" /></label>
+      <label>Valor Programa:<input type="text" id="VALOR_PROGRAMA" /></label>
+      <label>PAX Mínimos:<input type="number" id="PAX_MIN" /></label>
+      <label>PAX Liberados:<input type="number" id="PAX_LIBERADOS" /></label>
       <label>Email destinatario:
-        <input list="emailList" id="DEST_EMAIL" placeholder="Selecciona un email" />
+        <input list="emailList" id="DEST_EMAIL" />
       </label>
       <datalist id="emailList">
         <option value="nachopastorpino@gmail.com">
@@ -62,19 +57,14 @@
         <option value="aflores@raitrai.cl">
         <option value="chernandez@raitrai.cl">
       </datalist>
-
-      <label>Moneda:
-        <select id="MONEDA">
-          <option value="">Selecciona moneda</option>
-          <option value="$USD">$USD</option>
-          <option value="$CLP">$CLP</option>
-        </select>
-      </label>
-      <label>Cuota Inscripción:<input type="text" id="CUOTA_INSCRIPCION" placeholder="Ej. 150" /></label>
+      <label>Moneda:<select id="MONEDA">
+        <option value="">Selecciona moneda</option>
+        <option value="$USD">$USD</option>
+        <option value="$CLP">$CLP</option>
+      </select></label>
+      <label>Cuota Inscripción:<input type="text" id="CUOTA_INSCRIPCION" /></label>
       <label>Fecha Inscripción:<input type="date" id="FECHA_INSCRIPCION" /></label>
       <label>Fecha Pago Final:<input type="date" id="FECHA_PAGO_FINAL" /></label>
-
-      <!-- CAMPOS ADICIONALES -->
       <label>Número de Cuotas:<input type="number" id="NUM_CUOTAS" /></label>
       <label>Valor de Cuota Mensual:<input type="text" id="MONEDA_CUOTA_MENSUAL" /></label>
       <label>Mes Inicio Pago:<input type="text" id="MES_INICIO_PAGO" /></label>
@@ -86,11 +76,11 @@
       <label>Fecha Corte Contrato:<input type="date" id="FECHA_CORTE_CONTRATO" /></label>
       <label>Mes del Viaje:<input type="text" id="MES_VIAJE" /></label>
       <label>Lugar de Salida:<input type="text" id="LUGAR_SALIDA" /></label>
-
-      <!-- NUEVOS CAMPOS OCULTOS PARA CORREO -->
-      <input type="hidden" id="AUTORIZACION" />
-      <input type="hidden" id="DESCUENTO" />
     </div>
+
+    <!-- ⛔ Campos ocultos solo para el cuerpo del correo -->
+    <input type="hidden" id="AUTORIZACION" />
+    <input type="hidden" id="DESCUENTO" />
 
     <!-- 3) CLÁUSULAS ADICIONALES -->
     <h2>Cláusulas adicionales</h2>
@@ -102,5 +92,110 @@
     <div id="estado" style="margin-top:1rem;font-style:italic;color:#c0392b;"></div>
   </div>
 
+  <script>
+    const sheetURL = 'https://script.google.com/macros/s/AKfycbzU3RIF2TXDhlUwuSZj9VFnEienz0_XPw1mVwqzj6TWL3afs4GE-9kFkaRy9ps5YSqFaQ/exec';
+
+    document.getElementById("addClause").addEventListener("click", () => {
+      const cont = document.getElementById("clausulasContainer");
+      const w = document.createElement("div");
+      w.className = "clausula";
+      w.innerHTML = `
+        <label>Título cláusula:<input type="text" name="titulo" /></label>
+        <label>Texto cláusula:<textarea name="texto" rows="4"></textarea></label>
+        <button type="button" class="removeClause">Eliminar</button>`;
+      cont.appendChild(w);
+      w.querySelector(".removeClause").onclick = () => w.remove();
+    });
+
+    // 🔄 Leer datos desde Google Sheet
+    window.addEventListener("DOMContentLoaded", () => {
+      fetch(sheetURL)
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(rows => {
+          const bl = document.getElementById("businessList");
+          const gl = document.getElementById("grupoList");
+
+          rows.forEach(r => {
+            if (r.numeroNegocio) bl.append(new Option(r.numeroNegocio, r.numeroNegocio));
+            if (r.nombreGrupo) gl.append(new Option(r.nombreGrupo, r.nombreGrupo));
+          });
+
+          ["numeroNegocio", "nombreGrupo"].forEach(id => {
+            document.getElementById(id).addEventListener("change", e => {
+              const v = e.target.value.trim();
+              const row = rows.find(r => r.numeroNegocio === v || r.nombreGrupo === v);
+              if (!row) return;
+
+              const m = row.nombreGrupo.match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
+              if (m) {
+                document.getElementById("COLEGIO").value = m[1];
+                document.getElementById("CURSO").value = m[2];
+                document.getElementById("AÑO").value = m[3];
+              }
+
+              document.getElementById("COMUNA").value = row.direccion || "";
+              document.getElementById("VALOR_PROGRAMA").value = (row.valorPrograma || "").replace(/[^\d]/g, "");
+              document.getElementById("PAX_MIN").value = row.cantidadgrupo || "";
+              document.getElementById("PAX_LIBERADOS").value = row.liberados || "";
+
+              // 🟡 Campos ocultos solo para el correo
+              document.getElementById("AUTORIZACION").value = row.autorizacion || "";
+              document.getElementById("DESCUENTO").value = row.descuento || "";
+            });
+          });
+        })
+        .catch(err => {
+          console.error("Error leyendo datos:", err);
+          document.getElementById("estado").textContent = "❌ No se pudo cargar la base.";
+        });
+    });
+
+    async function generarContrato() {
+      const campos = [
+        "numeroNegocio", "FECHA_CONTRATO", "CURSO", "AÑO", "COLEGIO", "COMUNA", "VALOR_PROGRAMA",
+        "PAX_MIN", "PAX_LIBERADOS", "DEST_EMAIL", "MONEDA", "CUOTA_INSCRIPCION", "FECHA_INSCRIPCION",
+        "FECHA_PAGO_FINAL", "NUM_CUOTAS", "MONEDA_CUOTA_MENSUAL", "MES_INICIO_PAGO", "ANO_INICIO_PAGO",
+        "MES_FIN_PAGO", "ANO_FIN_PAGO", "DIA_PAGO_MENSUAL", "FECHA_ULTIMA_CUOTA", "FECHA_CORTE_CONTRATO",
+        "MES_VIAJE", "LUGAR_SALIDA", "AUTORIZACION", "DESCUENTO"
+      ];
+
+      const data = {};
+      campos.forEach(id => data[id] = document.getElementById(id)?.value || "");
+
+      // Alias múltiples
+      data.AÑO1 = data.AÑO;
+      data.MONEDA1 = data.MONEDA;
+      data.MONEDA2 = data.MONEDA;
+      data.VALOR_PROGRAMA1 = data.VALOR_PROGRAMA;
+      data.CUOTA_INSCRIPCION1 = data.CUOTA_INSCRIPCION;
+
+      data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div => ({
+        titulo: div.querySelector("input[name=titulo]").value,
+        texto: div.querySelector("textarea[name=texto]").value
+      })).filter(c => c.titulo || c.texto);
+
+      document.getElementById("estado").textContent = "⏳ Generando contrato…";
+
+      try {
+        const res = await fetch("/api/generar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(await res.text());
+
+        const blob = await res.blob();
+        const fn = res.headers.get("Content-Disposition")?.match(/filename="?(.+?)"?$/)?.[1] || "Contrato.docx";
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = fn;
+        a.click();
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+      } finally {
+        document.getElementById("estado").textContent = "";
+      }
+    }
+  </script>
 </body>
 </html>
