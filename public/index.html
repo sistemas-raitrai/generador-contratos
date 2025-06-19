@@ -41,7 +41,7 @@
       <label>Año:<input type="number" id="AÑO" /></label>
       <label>Colegio:<input type="text" id="COLEGIO" /></label>
       <label>Comuna:<input type="text" id="COMUNA" /></label>
-      <label>Valor Programa:<input type="text" id="VALOR_PROGRAMA" /></label>
+      <label>Valor del Programa:<input type="text" id="VALOR_PROGRAMA" /></label>
       <label>PAX Mínimos:<input type="number" id="PAX_MIN" /></label>
       <label>PAX Liberados:<input type="number" id="PAX_LIBERADOS" /></label>
       <label>Email destinatario:
@@ -63,17 +63,16 @@
         <option value="$CLP">$CLP</option>
       </select></label>
       <label>Cuota Inscripción:<input type="text" id="CUOTA_INSCRIPCION" /></label>
-      <label>Fecha Inscripción:<input type="date" id="FECHA_INSCRIPCION" /></label>
-      <label>Fecha Pago Final:<input type="date" id="FECHA_PAGO_FINAL" /></label>
+      <label>Fecha Inscripción:<input type="date" id="FECHA_INICIO_PAGO" /></label>
+      <label>Fecha Pago Final:<input type="date" id="FECHA_FIN_PAGO" /></label>
       <label>Número de Cuotas:<input type="number" id="NUM_CUOTAS" /></label>
-      <label>Valor de Cuota Mensual:<input type="text" id="MONEDA_CUOTA_MENSUAL" /></label>
-      <label>Mes Inicio Pago:<input type="text" id="MES_INICIO_PAGO" /></label>
-      <label>Año Inicio Pago:<input type="number" id="ANO_INICIO_PAGO" /></label>
-      <label>Mes Fin Pago:<input type="text" id="MES_FIN_PAGO" /></label>
-      <label>Año Fin Pago:<input type="number" id="ANO_FIN_PAGO" /></label>
-      <label>Día de Pago Mensual:<input type="number" id="DIA_PAGO_MENSUAL" /></label>
-      <label>Fecha Última Cuota:<input type="date" id="FECHA_ULTIMA_CUOTA" /></label>
-      <label>Fecha Corte Contrato:<input type="date" id="FECHA_CORTE_CONTRATO" /></label>
+      <label>Valor de Cuota Mensual:<input type="number" id="CUOTA_MENSUAL" /></label>
+      <label>Mes Inicio Pago:<input type="text" id="MES_INICIO" /></label>
+      <label>Año Inicio Pago:<input type="number" id="ANO_INICIO" /></label>
+      <label>Mes Fin Pago:<input type="text" id="MES_FIN" /></label>
+      <label>Año Fin Pago:<input type="number" id="ANO_FIN" /></label>
+      <label>Día de Pago Mensual:<input type="number" id="DIA_PAGO" /></label>
+      <label>Fecha Corte Contrato:<input type="date" id="FECHA_CORTE" /></label>
       <label>Mes del Viaje:<input type="text" id="MES_VIAJE" /></label>
       <label>Lugar de Salida:<input type="text" id="LUGAR_SALIDA" /></label>
     </div>
@@ -153,9 +152,9 @@
     async function generarContrato() {
       const campos = [
         "numeroNegocio", "FECHA_CONTRATO", "CURSO", "AÑO", "COLEGIO", "COMUNA", "VALOR_PROGRAMA",
-        "PAX_MIN", "PAX_LIBERADOS", "DEST_EMAIL", "MONEDA", "CUOTA_INSCRIPCION", "FECHA_INSCRIPCION",
-        "FECHA_PAGO_FINAL", "NUM_CUOTAS", "MONEDA_CUOTA_MENSUAL", "MES_INICIO_PAGO", "ANO_INICIO_PAGO",
-        "MES_FIN_PAGO", "ANO_FIN_PAGO", "DIA_PAGO_MENSUAL", "FECHA_ULTIMA_CUOTA", "FECHA_CORTE_CONTRATO",
+        "PAX_MIN", "PAX_LIBERADOS", "DEST_EMAIL", "MONEDA", "CUOTA_INSCRIPCION", "FECHA_INICIO_PAGO",
+        "FECHA_FIN_PAGO", "NUM_CUOTAS", "CUOTA_MENSUAL", "MES_INICIO", "ANO_INICIO",
+        "MES_FIN", "ANO_FIN", "DIA_PAGO", "FECHA_CORTE",
         "MES_VIAJE", "LUGAR_SALIDA", "AUTORIZACION", "DESCUENTO", "nombreGrupo" // ✅ añadido aquí
       ];
 
