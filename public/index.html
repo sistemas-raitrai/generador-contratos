@@ -8,20 +8,20 @@
   <link rel="icon" href="/logo.png" />
 </head>
 <body>
-  <!-- ENCABEZADO -->
-  <div style="background:#fff;padding:1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ccc;">
-    <div style="display:flex;align-items:center;">
-      <img src="/logo.png" alt="Logo Rai Trai" style="height:60px;margin-right:1rem;">
-      <div>
-        <h2 style="margin:0;font-size:1.5rem;color:#2c3e50;">GENERADOR AUTOMÁTICO DE CONTRATOS</h2>
-        <p style="margin:0;font-size:0.9rem;"><strong>Plantilla fija en servidor</strong></p>
+  <div class="contenedor">
+
+    <!-- 1) Encabezado -->
+    <div style="background:#fff;padding:1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ccc;">
+      <div style="display:flex;align-items:center;">
+        <img src="/logo.png" alt="Logo Rai Trai" style="height:60px;margin-right:1rem;">
+        <div>
+          <h2 style="margin:0;font-size:1.5rem;color:#2c3e50;">GENERADOR AUTOMÁTICO DE CONTRATOS</h2>
+          <p style="margin:0;font-size:0.9rem;"><strong>Plantilla fija en servidor</strong></p>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- CONTENEDOR PRINCIPAL -->
-  <div class="contenedor">
-    <!-- 1) SELECCIÓN DE GRUPO -->
+    <!-- 2) Selección de grupo -->
     <h2>Seleccionar Grupo</h2>
     <label>Número de Negocio:
       <input list="businessList" id="numeroNegocio" placeholder="Buscar..." />
@@ -33,7 +33,7 @@
     </label>
     <datalist id="grupoList"></datalist>
 
-    <!-- 2) DATOS DEL CONTRATO -->
+    <!-- 3) Datos del contrato -->
     <h2>Datos del Contrato</h2>
     <div class="grid">
       <label>Fecha del Contrato:<input type="date" id="FECHA_CONTRATO" /></label>
@@ -78,16 +78,17 @@
       <label>Lugar de Salida:<input type="text" id="LUGAR_SALIDA" /></label>
     </div>
 
-    <!-- ⛔ Campos ocultos solo para el cuerpo del correo -->
+    <!-- ⛔ Campos ocultos solo para el correo -->
     <input type="hidden" id="AUTORIZACION" />
     <input type="hidden" id="DESCUENTO" />
+    <input type="hidden" id="nombreGrupo" /> <!-- ✅ Este es nuevo -->
 
-    <!-- 3) CLÁUSULAS ADICIONALES -->
+    <!-- 4) Cláusulas adicionales -->
     <h2>Cláusulas adicionales</h2>
     <div id="clausulasContainer"></div>
     <button id="addClause" style="margin-bottom:1rem;">➕ Agregar cláusula</button>
 
-    <!-- 4) GENERAR -->
+    <!-- 5) Generar -->
     <button onclick="generarContrato()">📄 Descargar Contrato</button>
     <div id="estado" style="margin-top:1rem;font-style:italic;color:#c0392b;"></div>
   </div>
@@ -95,19 +96,7 @@
   <script>
     const sheetURL = 'https://script.google.com/macros/s/AKfycbzU3RIF2TXDhlUwuSZj9VFnEienz0_XPw1mVwqzj6TWL3afs4GE-9kFkaRy9ps5YSqFaQ/exec';
 
-    document.getElementById("addClause").addEventListener("click", () => {
-      const cont = document.getElementById("clausulasContainer");
-      const w = document.createElement("div");
-      w.className = "clausula";
-      w.innerHTML = `
-        <label>Título cláusula:<input type="text" name="titulo" /></label>
-        <label>Texto cláusula:<textarea name="texto" rows="4"></textarea></label>
-        <button type="button" class="removeClause">Eliminar</button>`;
-      cont.appendChild(w);
-      w.querySelector(".removeClause").onclick = () => w.remove();
-    });
-
-    // 🔄 Leer datos desde Google Sheet
+    // 🔁 Carga de grupos y autofill
     window.addEventListener("DOMContentLoaded", () => {
       fetch(sheetURL)
         .then(r => r.ok ? r.json() : Promise.reject(r.status))
@@ -137,10 +126,9 @@
               document.getElementById("VALOR_PROGRAMA").value = (row.valorPrograma || "").replace(/[^\d]/g, "");
               document.getElementById("PAX_MIN").value = row.cantidadgrupo || "";
               document.getElementById("PAX_LIBERADOS").value = row.liberados || "";
-
-              // 🟡 Campos ocultos solo para el correo
               document.getElementById("AUTORIZACION").value = row.autorizacion || "";
               document.getElementById("DESCUENTO").value = row.descuento || "";
+              document.getElementById("nombreGrupo").value = row.nombreGrupo || ""; // ✅ Agregado
             });
           });
         })
@@ -150,19 +138,20 @@
         });
     });
 
+    // 🔘 Botón de generar contrato
     async function generarContrato() {
       const campos = [
         "numeroNegocio", "FECHA_CONTRATO", "CURSO", "AÑO", "COLEGIO", "COMUNA", "VALOR_PROGRAMA",
         "PAX_MIN", "PAX_LIBERADOS", "DEST_EMAIL", "MONEDA", "CUOTA_INSCRIPCION", "FECHA_INSCRIPCION",
         "FECHA_PAGO_FINAL", "NUM_CUOTAS", "MONEDA_CUOTA_MENSUAL", "MES_INICIO_PAGO", "ANO_INICIO_PAGO",
         "MES_FIN_PAGO", "ANO_FIN_PAGO", "DIA_PAGO_MENSUAL", "FECHA_ULTIMA_CUOTA", "FECHA_CORTE_CONTRATO",
-        "MES_VIAJE", "LUGAR_SALIDA", "AUTORIZACION", "DESCUENTO"
+        "MES_VIAJE", "LUGAR_SALIDA", "AUTORIZACION", "DESCUENTO", "nombreGrupo" // ✅ añadido aquí
       ];
 
       const data = {};
       campos.forEach(id => data[id] = document.getElementById(id)?.value || "");
 
-      // Alias múltiples
+      // Alias para plantillas Word
       data.AÑO1 = data.AÑO;
       data.MONEDA1 = data.MONEDA;
       data.MONEDA2 = data.MONEDA;
