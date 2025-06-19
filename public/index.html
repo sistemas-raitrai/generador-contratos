@@ -118,7 +118,7 @@
             ["change", "input", "blur"].forEach(eventType => {
               el.addEventListener(eventType, () => {
                 const v = el.value.trim();
-                const row = rows.find(r => r.numeroNegocio === v || r.nombreGrupo === v);
+                const row = rows.find(r => String(r.numeroNegocio) === v || r.nombreGrupo === v);
                 if (!row) return;
     
                 // 🎯 Extraer datos del grupo
