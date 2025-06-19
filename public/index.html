@@ -86,6 +86,10 @@
       <label>Fecha Corte Contrato:<input type="date" id="FECHA_CORTE_CONTRATO" /></label>
       <label>Mes del Viaje:<input type="text" id="MES_VIAJE" /></label>
       <label>Lugar de Salida:<input type="text" id="LUGAR_SALIDA" /></label>
+
+      <!-- NUEVOS CAMPOS OCULTOS PARA CORREO -->
+      <input type="hidden" id="AUTORIZACION" />
+      <input type="hidden" id="DESCUENTO" />
     </div>
 
     <!-- 3) CLÁUSULAS ADICIONALES -->
@@ -98,122 +102,5 @@
     <div id="estado" style="margin-top:1rem;font-style:italic;color:#c0392b;"></div>
   </div>
 
-  <script>
-    const sheetURL = 'https://script.google.com/macros/s/AKfycbzU3RIF2TXDhlUwuSZj9VFnEienz0_XPw1mVwqzj6TWL3afs4GE-9kFkaRy9ps5YSqFaQ/exec';
-
-    document.getElementById("addClause").addEventListener("click", () => {
-      const cont = document.getElementById("clausulasContainer");
-      const w = document.createElement("div");
-      w.className = "clausula";
-      w.style.marginBottom = "1rem";
-      w.innerHTML = `
-        <label>Título cláusula:<input type="text" name="titulo" placeholder="Ej: Fuerza mayor"/></label>
-        <label>Texto cláusula:<textarea name="texto" rows="4" placeholder="Redacta la cláusula…"></textarea></label>
-        <button type="button" class="removeClause" style="background:#c0392b;color:#fff;">Eliminar</button>
-      `;
-      cont.appendChild(w);
-      w.querySelector(".removeClause").onclick = () => w.remove();
-    });
-
-    window.addEventListener("DOMContentLoaded", () => {
-      fetch(sheetURL)
-        .then(r => {
-          if (!r.ok) throw new Error("HTTP "+r.status);
-          return r.json();
-        })
-        .then(rows => {
-          const bl = document.getElementById("businessList");
-          const gl = document.getElementById("grupoList");
-          rows.forEach(r => {
-            if (r.numeroNegocio) bl.append(new Option(r.numeroNegocio, r.numeroNegocio));
-            if (r.nombreGrupo)  gl.append(new Option(r.nombreGrupo,  r.nombreGrupo));
-          });
-
-          ["numeroNegocio","nombreGrupo"].forEach(id => {
-            document.getElementById(id).addEventListener("change", e => {
-              const v = e.target.value.trim();
-              const row = rows.find(r =>
-                String(r.numeroNegocio) === v || r.nombreGrupo === v
-              );
-              if (!row) return;
-
-              const m = row.nombreGrupo.match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
-              if (m) {
-                document.getElementById("COLEGIO").value = m[1];
-                document.getElementById("CURSO").value   = m[2];
-                document.getElementById("AÑO").value     = m[3];
-              }
-
-              document.getElementById("COMUNA").value        = row.direccion || "";
-              document.getElementById("VALOR_PROGRAMA").value = String(row.valorPrograma || "").replace(/[^\d]/g,"");
-              document.getElementById("PAX_MIN").value       = row.cantidadgrupo || "";
-              document.getElementById("PAX_LIBERADOS").value = row.liberados || "";
-            });
-          });
-        })
-        .catch(err => {
-          console.error("❌ Error leyendo Sheet JSON:", err);
-          document.getElementById("estado").textContent = "❌ No fue posible cargar los datos.";
-        });
-    });
-    
-    async function generarContrato() {
-      const campos = [
-        'numeroNegocio',
-        'FECHA_CONTRATO','CURSO','AÑO','COLEGIO','COMUNA',
-        'VALOR_PROGRAMA','PAX_MIN','PAX_LIBERADOS',
-        'DEST_EMAIL','MONEDA','CUOTA_INSCRIPCION',
-        'FECHA_INSCRIPCION','FECHA_PAGO_FINAL',
-        'NUM_CUOTAS','MONEDA_CUOTA_MENSUAL','MES_INICIO_PAGO','ANO_INICIO_PAGO',
-        'MES_FIN_PAGO','ANO_FIN_PAGO','DIA_PAGO_MENSUAL','FECHA_ULTIMA_CUOTA',
-        'FECHA_CORTE_CONTRATO','MES_VIAJE','LUGAR_SALIDA'
-      ];
-    
-      const data = {};
-      campos.forEach(id => data[id] = document.getElementById(id)?.value || "");
-    
-      // Alias para reemplazos múltiples en Word
-      data.AÑO1 = data.AÑO;
-      data.MONEDA1 = data.MONEDA;
-      data.MONEDA2 = data.MONEDA;
-      data.MONEDA3 = data.MONEDA;
-      data.MONEDA4 = data.MONEDA;
-      data.MONEDA5 = data.MONEDA;
-      data.VALOR_PROGRAMA1 = data.VALOR_PROGRAMA;
-      data.CUOTA_INSCRIPCION1 = data.CUOTA_INSCRIPCION;
-      data.CUOTA_INSCRIPCION2 = data.CUOTA_INSCRIPCION;
-      data.CUOTA_INSCRIPCION3 = data.CUOTA_INSCRIPCION;
-      data.FECHA_MAX_INSCRIPCION = data.FECHA_INSCRIPCION;
-      data.FECHA_MAX_INSCRIPCION1 = data.FECHA_INSCRIPCION;
-    
-      data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div => ({
-        titulo: div.querySelector("input[name=titulo]").value,
-        texto:  div.querySelector("textarea[name=texto]").value
-      })).filter(c => c.titulo || c.texto);
-    
-      document.getElementById("estado").textContent = "⏳ Generando contrato…";
-    
-      try {
-        const res = await fetch("/api/generar", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(await res.text());
-        const blob = await res.blob();
-        const fn = res.headers.get("Content-Disposition")?.match(/filename="?(.+)"?$/)?.[1] || "Contrato.docx";
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = fn;
-        document.body.append(a);
-        a.click();
-        a.remove();
-      } catch (err) {
-        alert("Error: " + err.message);
-      } finally {
-        document.getElementById("estado").textContent = "";
-      }
-    }
-  </script>
 </body>
 </html>
