@@ -96,39 +96,50 @@
   <script>
     const sheetURL = 'https://script.google.com/macros/s/AKfycbzU3RIF2TXDhlUwuSZj9VFnEienz0_XPw1mVwqzj6TWL3afs4GE-9kFkaRy9ps5YSqFaQ/exec';
 
-    // 🔁 Carga de grupos y autofill
+    // 🔁 Carga de grupos y configuración de autocompletado robusto
     window.addEventListener("DOMContentLoaded", () => {
       fetch(sheetURL)
         .then(r => r.ok ? r.json() : Promise.reject(r.status))
         .then(rows => {
           const bl = document.getElementById("businessList");
           const gl = document.getElementById("grupoList");
-
+    
+          // 🔽 Llenar datalist con número de negocio y nombre de grupo
           rows.forEach(r => {
             if (r.numeroNegocio) bl.append(new Option(r.numeroNegocio, r.numeroNegocio));
-            if (r.nombreGrupo) gl.append(new Option(r.nombreGrupo, r.nombreGrupo));
+            if (r.nombreGrupo)   gl.append(new Option(r.nombreGrupo,   r.nombreGrupo));
           });
-
+    
+          // 🎯 Detectar cambios en ambos campos y hacer autocompletado
           ["numeroNegocio", "nombreGrupo"].forEach(id => {
-            document.getElementById(id).addEventListener("change", e => {
-              const v = e.target.value.trim();
-              const row = rows.find(r => r.numeroNegocio === v || r.nombreGrupo === v);
-              if (!row) return;
-
-              const m = row.nombreGrupo.match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
-              if (m) {
-                document.getElementById("COLEGIO").value = m[1];
-                document.getElementById("CURSO").value = m[2];
-                document.getElementById("AÑO").value = m[3];
-              }
-
-              document.getElementById("COMUNA").value = row.direccion || "";
-              document.getElementById("VALOR_PROGRAMA").value = (row.valorPrograma || "").replace(/[^\d]/g, "");
-              document.getElementById("PAX_MIN").value = row.cantidadgrupo || "";
-              document.getElementById("PAX_LIBERADOS").value = row.liberados || "";
-              document.getElementById("AUTORIZACION").value = row.autorizacion || "";
-              document.getElementById("DESCUENTO").value = row.descuento || "";
-              document.getElementById("nombreGrupo").value = row.nombreGrupo || ""; // ✅ Agregado
+            const el = document.getElementById(id);
+    
+            // Escucha tanto cambios directos como escritura y desenfoque (blur)
+            ["change", "input", "blur"].forEach(eventType => {
+              el.addEventListener(eventType, () => {
+                const v = el.value.trim();
+                const row = rows.find(r => r.numeroNegocio === v || r.nombreGrupo === v);
+                if (!row) return;
+    
+                // 🎯 Extraer datos del grupo
+                const m = row.nombreGrupo.match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
+                if (m) {
+                  document.getElementById("COLEGIO").value = m[1];
+                  document.getElementById("CURSO").value   = m[2];
+                  document.getElementById("AÑO").value     = m[3];
+                }
+    
+                // 📥 Rellenar todos los campos con la información correspondiente
+                document.getElementById("COMUNA").value           = row.direccion || "";
+                document.getElementById("VALOR_PROGRAMA").value   = (row.valorPrograma || "").replace(/[^\d]/g, "");
+                document.getElementById("PAX_MIN").value          = row.cantidadgrupo || "";
+                document.getElementById("PAX_LIBERADOS").value    = row.liberados || "";
+    
+                // 🟡 Campos ocultos solo para email
+                document.getElementById("AUTORIZACION").value     = row.autorizacion || "";
+                document.getElementById("DESCUENTO").value        = row.descuento || "";
+                document.getElementById("nombreGrupo").value      = row.nombreGrupo || "";
+              });
             });
           });
         })
