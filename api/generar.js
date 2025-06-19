@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     const filename = `Contrato ${req.body.CURSO} ${req.body.COLEGIO} ${req.body.AÑO} - RaiTrai`;
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    res.send(Buffer.from(await docxBuffer.arrayBuffer()));
+    res.send(docxBuffer);
   } catch (error) {
     console.error('Error al generar contrato:', error);
     res.status(500).json({ error: 'Error al generar el contrato' });
