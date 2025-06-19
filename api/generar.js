@@ -1,11 +1,14 @@
+// 📦 Importaciones
 import fs from 'fs';
 import path from 'path';
 import docx from 'html-docx-js';
 import { promisify } from 'util';
-import { Resend } from 'resend';
+import sgMail from '@sendgrid/mail'; // ✅ NUEVO: en lugar de "resend"
 
 const readFile = promisify(fs.readFile);
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+// ✅ Clave de SendGrid desde Vercel (variable de entorno)
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -13,55 +16,53 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1. Leer plantilla HTML
+    // 1️⃣ Leer plantilla HTML desde la carpeta "templates"
     const templatePath = path.join(process.cwd(), 'templates', 'contrato-template.html');
     let html = await readFile(templatePath, 'utf8');
 
-    // 2. Reemplazar variables {{ }} por datos del body
+    // 2️⃣ Reemplazar {{variables}} con valores del formulario
     const datos = req.body;
     for (const key in datos) {
       const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
       html = html.replace(regex, datos[key]);
     }
 
-    // 3. Convertir HTML a DOCX
+    // 3️⃣ Convertir HTML a DOCX
     const docxBuffer = await docx.asBlob(html);
     const arrayBuffer = await docxBuffer.arrayBuffer();
     const bufferFinal = Buffer.from(arrayBuffer);
 
-    // 4. Nombre del archivo
-    const filename = `Contrato ${req.body.CURSO} ${req.body.COLEGIO} ${req.body.AÑO} - RaiTrai.docx`;
+    // 4️⃣ Nombre del archivo a enviar
+    const filename = `Contrato ${datos.CURSO} ${datos.COLEGIO} ${datos.AÑO} - RaiTrai.docx`;
 
-    // 5. Armar el cuerpo del correo
+    // 5️⃣ Texto plano del correo
     const textoCorreo = `Estimado/a:
 
-Adjuntamos el contrato correspondiente al grupo "${req.body.nombreGrupo}", programado para el año ${req.body.AÑO}. 
-En la ficha, el campo de autorización dice "${req.body.AUTORIZACION}" y el campo descuento "${req.body.DESCUENTO}".
+Adjuntamos el contrato correspondiente al grupo "${datos.nombreGrupo}", programado para el año ${datos.AÑO}. 
+En la ficha, el campo de autorización dice "${datos.AUTORIZACION}" y el campo descuento "${datos.DESCUENTO}".
 
 Para cualquier duda, estamos atentos.
 
 Saludos,
 Equipo RaiTrai`;
 
-    // 6. Enviar email con Resend
-    console.log("🔍 Resend instancia:", resend);
-    console.log("📬 Resend.emails:", resend.emails);
-    
-    await resend.emails.send({
-      from: 'RaiTrai <onboarding@resend.dev>',
-      to: [req.body.DEST_EMAIL, 'administracion@raitrai.cl'],
-      subject: `Contrato ${req.body.CURSO} ${req.body.COLEGIO} ${req.body.AÑO}`,
+    // 6️⃣ Enviar email con SendGrid
+    await sgMail.send({
+      to: [datos.DEST_EMAIL, 'administracion@raitrai.cl'],
+      from: 'notificaciones@raitrai.online', // ✅ Usar remitente verificado
+      subject: `Contrato ${datos.CURSO} ${datos.COLEGIO} ${datos.AÑO}`,
       text: textoCorreo,
       attachments: [
         {
-          filename: filename,
           content: bufferFinal.toString('base64'),
-          encoding: 'base64'
+          filename,
+          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          disposition: 'attachment'
         }
       ]
     });
 
-    // 7. Descargar el archivo
+    // 7️⃣ Descargar archivo como respuesta
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     res.send(bufferFinal);
