@@ -164,6 +164,9 @@
       const cuotaInscripcion = parseMonto(document.getElementById("CUOTA_INSCRIPCION").value);
       const valorPrograma = parseMonto(document.getElementById("VALOR_PROGRAMA").value);
       const dividir = document.getElementById("DIVIDIR_CUOTA")?.checked;
+
+      const fechaInicioRaw = document.getElementById("FECHA_INICIO_PAGO").value;
+      const fechaFinRaw = document.getElementById("FECHA_FIN_PAGO").value;
     
       const fechaInicio = new Date(document.getElementById("FECHA_INICIO_PAGO").value);
       const fechaFin = new Date(document.getElementById("FECHA_FIN_PAGO").value);
@@ -171,37 +174,23 @@
       // Validación básica
       if (isNaN(fechaInicio) || isNaN(fechaFin) || !cuotaInscripcion || !valorPrograma) return;
     
-      // 🔁 Ajustar la fecha de inicio para el cálculo de cuotas reales
-      const fechaInicioMensual = new Date(fechaInicio);
-      if (dividir) {
-        // si se divide, los pagos mensuales inician 2 meses después
-        fechaInicioMensual.setMonth(fechaInicioMensual.getMonth() + 2);
-      } else {
-        // si no se divide, los pagos mensuales inician 1 mes después
-        fechaInicioMensual.setMonth(fechaInicioMensual.getMonth() + 1);
-      }
+      // 🔁 Calcular meses reales de pago mensual (sin contar inscripción)
+      const mesesPago = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth()) + 1;
     
-      // 🔢 Calcular meses de pago mensual desde fechaInicioMensual hasta fechaFin (inclusive)
-      const mesesPago = (fechaFin.getFullYear() - fechaInicioMensual.getFullYear()) * 12 +
-                        (fechaFin.getMonth() - fechaInicioMensual.getMonth()) + 1;
-    
-      // 📌 Calcular total de cuotas
-      const cuotasInscripcion = dividir ? 2 : 1;
-      const totalCuotas = cuotasInscripcion + mesesPago;
-    
-      // 💰 Calcular valor mensual
+      // 💰 Calcular valor mensual (valor programa menos inscripción dividido por meses de pago)
       const restante = valorPrograma - cuotaInscripcion;
       const valorMensual = mesesPago > 0 ? (restante / mesesPago) : 0;
     
       // ✍️ Actualizar valores en el formulario
-      document.getElementById("NUM_CUOTAS").value = totalCuotas;
-      document.getElementById("CUOTA_MENSUAL").value = valorMensual.toFixed(2);
+      document.getElementById("NUM_CUOTAS").value = mesesPago;
+      document.getElementById("CUOTA_MENSUAL").value = valorMensual.toFixed(2).replace(".", ",");
     
-      document.getElementById("MES_INICIO").value = fechaInicio.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
-      document.getElementById("ANO_INICIO").value = fechaInicio.getFullYear();
+      // ✅ Mostrar el mes y año de la fecha de inscripción (como solicitaste explícitamente)
+      document.getElementById("MES_INICIO").value = inicio.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+      document.getElementById("ANO_INICIO").value = inicio.getFullYear();
     
-      document.getElementById("MES_FIN").value = fechaFin.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
-      document.getElementById("ANO_FIN").value = fechaFin.getFullYear();
+      document.getElementById("MES_FIN").value = fin.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+      document.getElementById("ANO_FIN").value = fin.getFullYear();
     }
     // 🔘 Botón de generar contrato
     async function generarContrato() {
