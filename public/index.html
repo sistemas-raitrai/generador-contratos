@@ -168,26 +168,39 @@
       const fechaInicioRaw = document.getElementById("FECHA_INICIO_PAGO").value;
       const fechaFinRaw = document.getElementById("FECHA_FIN_PAGO").value;
     
-      const fechaInicio = new Date(fechaInicioRaw);
+      const fechaInscripcion = new Date(fechaInicioRaw);
       const fechaFin = new Date(fechaFinRaw);
     
-      // Validación básica
-      if (isNaN(fechaInicio) || isNaN(fechaFin) || !cuotaInscripcion || !valorPrograma) return;
+      // 🛑 Validación de campos
+      if (isNaN(fechaInscripcion) || isNaN(fechaFin) || !cuotaInscripcion || !valorPrograma) return;
     
-      // 🔁 Calcular meses reales de pago mensual (sin contar inscripción)
-      const mesesPago = (fechaFin.getFullYear() - fechaInicio.getFullYear()) * 12 +
-                        (fechaFin.getMonth() - fechaInicio.getMonth()) + 1;
+      // 🔁 Ajuste de fecha de inicio de pago mensual
+      const fechaInicioMensual = new Date(fechaInscripcion);
+      if (dividir) {
+        // Si se divide en dos pagos, los pagos mensuales comienzan dos meses después
+        fechaInicioMensual.setMonth(fechaInicioMensual.getMonth() + 2);
+      } else {
+        // Si no se divide, los pagos comienzan un mes después
+        fechaInicioMensual.setMonth(fechaInicioMensual.getMonth() + 1);
+      }
     
+      // 📆 Cálculo de número de cuotas mensuales reales (sin inscripción)
+      const mesesPago = (fechaFin.getFullYear() - fechaInicioMensual.getFullYear()) * 12 +
+                        (fechaFin.getMonth() - fechaInicioMensual.getMonth()) + 1;
+    
+      // 💲 Cálculo del valor mensual (restante dividido por cuotas reales)
       const restante = valorPrograma - cuotaInscripcion;
       const valorMensual = mesesPago > 0 ? (restante / mesesPago) : 0;
     
-      // ✍️ Actualizar valores en el formulario
+      // ✍️ Actualización de campos en el formulario
       document.getElementById("NUM_CUOTAS").value = mesesPago;
       document.getElementById("CUOTA_MENSUAL").value = valorMensual.toFixed(2).replace(".", ",");
     
-      document.getElementById("MES_INICIO").value = fechaInicio.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
-      document.getElementById("ANO_INICIO").value = fechaInicio.getFullYear();
+      // 📅 Mostrar mes y año de la inscripción (no del inicio de pagos)
+      document.getElementById("MES_INICIO").value = fechaInscripcion.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+      document.getElementById("ANO_INICIO").value = fechaInscripcion.getFullYear();
     
+      // 📅 Mostrar mes y año del fin de pagos
       document.getElementById("MES_FIN").value = fechaFin.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
       document.getElementById("ANO_FIN").value = fechaFin.getFullYear();
     }
