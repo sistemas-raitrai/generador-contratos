@@ -189,6 +189,10 @@
       // 🗓️ Clonar fechas para no alterar las originales
       const inicio = new Date(fechaInicio);
       const fin = new Date(fechaFin);
+      
+      // ✅ Fijar hora al mediodía para evitar desfasajes de mes
+      inicio.setHours(12, 0, 0, 0);
+      fin.setHours(12, 0, 0, 0);
     
       console.log("📅 Día del inicio original:", inicio.getDate());
        
