@@ -173,8 +173,10 @@
       const fechaInicioRaw = document.getElementById('FECHA_INICIO_PAGO').value;
       const fechaFinRaw = document.getElementById('FECHA_FIN_PAGO').value;
     
-      const fechaInicio = new Date(fechaInicioRaw);
-      const fechaFin = new Date(fechaFinRaw);
+      const [anioInicio, mesInicio, diaInicio] = fechaInicioRaw.split("-").map(Number);
+      const fechaInicio = new Date(anioInicio, mesInicio - 1, diaInicio);
+      const [anioFin, mesFin, diaFin] = fechaFinRaw.split("-").map(Number);
+      const fechaFin = new Date(anioFin, mesFin - 1, diaFin);
     
       console.log("📦 Datos crudos:", {
         cuotaInscripcion, valorPrograma, dividir, fechaInicio, fechaFin
@@ -195,14 +197,7 @@
       fin.setHours(12, 0, 0, 0);
     
       console.log("📅 Día del inicio original:", inicio.getDate());
-
-      // 📆 Ajustar el mes si el día no es 1 (por ejemplo, 2 de julio cuenta desde agosto)
-      if (inicio.getDate() > 1) {
-        inicio.setMonth(inicio.getMonth() + 1);
-        inicio.setDate(1);
-        console.log("📆 Día > 1, ajustando mes...");
-      }
-             
+           
       // 📊 Calcular cantidad total de meses de pago
       const mesesTotales = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth()) + 1;
       console.log("📅 Meses de pago:", mesesTotales);
