@@ -35,6 +35,13 @@ export default async function handler(req, res) {
     // 4️⃣ Nombre del archivo a enviar
     const filename = `Contrato ${datos.CURSO} ${datos.COLEGIO} ${datos.AÑO} - RaiTrai.docx`;
 
+    // 🛡️ Normalizar nombre de archivo para evitar caracteres conflictivos en encabezados HTTP
+    const filenameSeguro = filename
+      .normalize("NFD")                          // separa acentos
+      .replace(/[\u0300-\u036f]/g, "")          // elimina los acentos
+      .replace(/[^\x00-\x7F]/g, "")             // elimina cualquier carácter no ASCII
+      .replace(/\s+/g, "_");                    // reemplaza espacios por guiones bajos (opcional)
+
     // 5️⃣ Texto plano del correo
     const textoCorreo = `Estimado/a:
 
@@ -63,7 +70,7 @@ Equipo RaiTrai`;
     });
 
     // 7️⃣ Descargar archivo como respuesta
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${filenameSeguro}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     res.send(bufferFinal);
 
