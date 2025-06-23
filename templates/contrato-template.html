@@ -14,7 +14,7 @@
 <body>
   <h1>CONTRATO DE PRESTACIÓN DE SERVICIOS TURÍSTICOS</h1>
 
-  <p>En Santiago de Chile, {{FECHA_CONTRATO}}, entre TURISMO RAITRAI LIMITADA, Rut 78.384.230-0, en adelante también “La Agencia”, representada por su Gerente General, Carlos Flores Maragaño, Chileno, cédula nacional de identidad número 7.844.528-9, domiciliado en La Concepción Nº 141 oficina 305, Santiago, en adelante “LA AGENCIA”, por una parte y por la otra {{CURSO}} AÑO {{AÑO}} DEL COLEGIO {{COLEGIO}} COMUNA DE {{COMUNA}}, representado por las personas cuyos nombres se incluyen al final del presente instrumento, en adelante “El Grupo”, se conviene el contrato de prestación de servicios turísticos que se describe en las cláusulas siguientes:</p>
+  <p>En Santiago de Chile, {{FECHA_CONTRATO}}, entre TURISMO RAITRAI LIMITADA, Rut 78.384.230-0, en adelante también “La Agencia”, representada por su Gerente General, Carlos Flores Maragaño, Chileno, cédula nacional de identidad número 7.844.528-9, domiciliado en La Concepción Nº 141 oficina 305, Santiago, en adelante “LA AGENCIA”, por una parte y por la otra EL CURSO {{CURSO}} AÑO {{AÑO}} DEL COLEGIO {{COLEGIO}} COMUNA DE {{COMUNA}}, representado por las personas cuyos nombres se incluyen al final del presente instrumento, en adelante “El Grupo”, se conviene el contrato de prestación de servicios turísticos que se describe en las cláusulas siguientes:</p>
 
   <h2>PRIMERO:</h2>
   <p>La agencia y el grupo han acordado la realización de un programa de viajes de estudios para sus pupilos que se detalla en anexo N° 1, N° 2, N° 3 los cuales formarán parte del contrato para todos los efectos legales el cual es firmado por la Agencia y los representantes del grupo.</p>
@@ -100,16 +100,102 @@
   <h2>SEXTO:</h2>
   <p><strong>ASISTENCIA EN VIAJES Y SEGUROS.</strong></p>
   <p>Los participantes del programa serán beneficiados con los seguros correspondientes a los medios de transporte de pasajeros, así como también por el servicio de “Asistencia en viaje” descrita en el Anexo Nº 2, el “Seguro de cancelación previo a la salida del viaje” descrito en el Anexo N° 3, y el “Seguro de cancelación Any Reason” (ver cláusula en el artículo Décimo Primero, punto “j”).
-      TURISMO RAITRAI no tendrá responsabilidad por el pago de los deducibles ni por cantidades que excedan el límite de las coberturas establecidas en dichos seguros. La liquidación de estas coberturas y el pago de las asistencias se efectuarán directamente por las entidades aseguradoras que correspondan, conforme a sus propias condiciones.
-      Sin perjuicio de lo anterior, la Agencia prestará apoyo activo dentro de sus competencias para asistir al grupo en la gestión de estas coberturas, facilitar los trámites correspondientes, y acompañar al afectado en situaciones de emergencia o necesidad, actuando con la máxima disposición y buena fe operativa.
-      </p>
+  TURISMO RAITRAI no tendrá responsabilidad por el pago de los deducibles ni por cantidades que excedan el límite de las coberturas establecidas en dichos seguros. La liquidación de estas coberturas y el pago de las asistencias se efectuarán directamente por las entidades aseguradoras que correspondan, conforme a sus propias condiciones.
+  Sin perjuicio de lo anterior, la Agencia prestará apoyo activo dentro de sus competencias para asistir al grupo en la gestión de estas coberturas, facilitar los trámites correspondientes, y acompañar al afectado en situaciones de emergencia o necesidad, actuando con la máxima disposición y buena fe operativa.</p>
 
   <h2>SEPTIMO:</h2>
   <p><strong>PRECIO DEL VIAJE DE ESTUDIO.</strong></p>
   <p>El Viaje de Estudios tendrá un costo de {{MONEDA}} {{VALOR_PROGRAMA}}, establecido en el Anexo N°1, en la base mínima de {{PAX_MIN}} pasajeros pagados más {{PAX_LIBERADOS}} pasajeros liberados.  
-    Se deja constancia que el abono establecido por concepto de cuota de inscripción de {{MONEDA1}} {{CUOTA_INSCRIPCION}}, tendrá fecha de pago máxima {{FECHA_MAX_INSCRIPCION}} con el fin de establecer el tramo contratado. De otra manera, TURISMO RAITRAI se reserva el derecho de cambiar el tramo al valor del programa según el mínimo de pasajeros pagados.  
-    Es condición esencial que el precio pactado se encuentre totalmente pagado a plena satisfacción de la Agencia 60 días antes de salida: {{FECHA_PAGO_FINAL}}. De lo contrario, la Agencia podrá cancelar la reserva y aplicar penalidades.
+  Se deja constancia que el abono establecido por concepto de cuota de inscripción de {{MONEDA}} {{CUOTA_INSCRIPCION}}, tendrá fecha de pago máxima {{FECHA_INICIO_PAGO}} con el fin de establecer el tramo contratado. De otra manera, TURISMO RAITRAI se reserva el derecho de cambiar el tramo al valor del programa según el mínimo de pasajeros pagados.  
+  Es condición esencial que el precio pactado se encuentre totalmente pagado a plena satisfacción de la Agencia 60 días antes de salida: {{FECHA_FIN_PAGO}}. De lo contrario, la Agencia podrá cancelar la reserva y aplicar penalidades.
       </p>
+
+  <h2>OCTAVO:</h2>
+  <p><strong>ATRASOS EN LOS PAGOS.</strong></p>
+  <p>Todo pasajero que documente o cancele total o parcialmente el viaje fuera del plazo acordado estará sujeto a las variaciones de precio que pudieran producirse.
+  En caso de incumplimiento de los pagos pactados, <strong>Turismo Raitrai tiene la facultad de dar de baja al alumno y disponer del cupo no utilizado.</strong></p>
+
+  <h2>NOVENO:</h2>
+  <p><strong>DETALLE DE LA FORMA DE PAGO.</strong></p>
+  <p><strong>a) ABONO, O CUOTA DE INSCRIPCIÓN</strong> Convenido en la cantidad de {{MONEDA}} {{CUOTA_INSCRIPCION}}. Valor será descontado del saldo total a pagar del viaje. No es reembolsable ni transferible.  
+  La forma de pago que ofrece TURISMO RAITRAI se hace referencia en este instrumento y en anexo N°1 asciende a la suma de {{MONEDA}} {{VALOR_PROGRAMA}} por cada pasajero y se paga de la siguiente manera:  
+  Inscripción de {{MONEDA}} {{CUOTA_INSCRIPCION}} – abono {{FECHA_INICIO_PAGO}} + {{NUM_CUOTAS}} cuotas de {{MONEDA}} {{CUOTA_MENSUAL}} c/u de {{MES_INICIO}} {{AÑO_INICIO}} a {{MES_FIN}} {{AÑO_FIN}} (día {{DIA_PAGO}} de cada mes).</p>
+  <p>Pagada la inscripción, el apoderado deberá realizar los pagos mensuales para mantener el cupo. Recordar que el viaje debe quedar totalmente pagado 60 días antes del viaje.  El apoderado se compromete a pagar el total en cuotas sin interés, mensualmente; la última cuota vence el {{FECHA_FIN_PAGO}}.  En caso de incumplir 2 o más cuotas consecutivas, la Agencia podrá considerar que el pasajero renuncia al viaje. Se notificará al apoderado por escrito, otorgándole 5 días para regularizar. Si no lo hace, se aplicará el proceso de anulación conforme a este contrato. Hasta el {{FECHA_CORTE}} del año del viaje se podrán agregar pasajeros, ajustando el valor del tramo si corresponde. A partir del día siguiente, cualquier nuevo ingreso no modificará el tramo previamente establecido.</p>
+    
+  <p><strong>b) OTRAS FORMAS QUE PUEDE SER PAGADO EL VIAJE</strong>
+      1. Pesos Chilenos, dólares y cheques
+      2. Webpay a través de la página web www.raitrai.cl 
+      3. 3% de descuento  en el mes de la contratación por pago contado. (Solo transferencia, efectivo o cheque  al día). (Se excluye pago con tarjetas de crédito y/debito).
+      <strong>Nota: Pagada la inscripción el apoderado deberá realizar  los pagos mensuales para mantener el cupo.</strong></p>
+
+  <h2>DÉCIMO:</h2>
+  <p><strong>TIPO DE CAMBIO.</strong></p>
+  <p>Todos los pagos y reembolsos expresados en moneda extranjera serán establecidos por el área de administración de TURISMO RAITRAI.</p>
+
+  <h2>DÉCIMO PRIMERO:</h2>
+  <p><strong>POLÍTICAS DE ANULACIÓN.</strong></p>
+  <p>Se acuerda que para el efecto de anulación individual o colectiva del presente contrato de prestación de servicios antes de la realización del programa, se estará sujeto a las siguientes cláusulas:</p>
+  <p><strong>a)</strong>strong> En el evento de anulación tanto individual como colectiva, se retendrá el valor de “la cuota de inscripción”, que está fijada en {{MONEDA}} {{CUOTA_INSCRIPCION}}; <strong>no es reembolsable ni transferible sin excepción alguna. Toda solicitud de anulación deberá ser enviada por escrito vía correo electrónico a su asesor de viajes, con copia al encargado del grupo. Una vez recibida, la Agencia confirmará su recepción y asignará un número de caso, el cual será requisito para dar por oficializada la solicitud.</strong></p>
+  <p>En el caso de una anulación “colectiva”, y para efectos de devolución, “el grupo” debe cumplir con el 100% del pago de la cuota de inscripción de todos los pasajeros según el tramo contratado, además de las otras cláusulas según corresponda.</p>
+  <p><strong>b.1) EN CASO DE CHÁRTER.</strong></p>
+  <p>En el evento de anulación <strong>180 días antes de la salida</strong> y que se realicen en vuelos especiales tipo “Chárter”, se retendrá <strong>USD 550 para el caso de Brasil y USD 350 para el caso de chárter Bariloche pp.</strong>, más el valor de la inscripción, que no se devuelve ante ningún evento, sin excepción.</p>
+  <p><strong>b.2) EN CASO DE VUELOS REGULARES.</strong></p>
+  <p>Al tratarse de programas que tengan tramos aéreos en vuelos regulares, se retendrán los costos asociados a cualquier tipo de reservas de servicios del programa, más el valor de la inscripción, que no se devuelve ante ningún evento, sin excepción.</p>
+  <p><strong>c)</strong> Al tratarse de programas que exijan prepagos o abonos de hoteles, excursiones u otros servicios, y estos se encuentren realizados por la Agencia, <strong>se retendrá además el valor que cobre el prestador de servicio por la anulación.</strong></p>
+  <p><strong>d)</strong> En el evento de anulación de 90 a 61 días antes de la salida, se retendrá un 20 % del valor total del programa, más las cláusulas a) y b.1) o b.2) según corresponda.</p>
+  <p><strong>e)</strong> En el evento de anulación de 60 a 45 días antes de la salida, se retendrá un 50 % del valor total del programa, más las cláusulas a) y b.1) o b.2) según corresponda.</p>
+  <p><strong>f)</strong> En el caso de anulación de 44 a 31 días antes de la salida, se retendrá un 60 % del valor total del programa, más las cláusulas a) y b.1) o b.2) según corresponda.</p>
+  <p><strong>g)</strong> En el caso de anulaciones que se efectúen con menos de 30 días de la salida, se retendrá un 100 % del valor total del programa pactado.</p>
+  <p><strong>h)</strong> Al tratarse de una anulación individual por razones de salud con hospitalización, que se efectúe antes de las 72 horas de la salida, se retendrá la inscripción más el valor aéreo (en el caso de programas que consideren este tipo de transporte) y se devolverá el resto de lo pagado.</p>
+  <p><strong>i)</strong> Anulación “Any Reason” (cualquier motivo) con deducible de un 50 % del valor del programa, siempre y cuando esta cancelación no altere el mínimo de pasajeros pactados y el programa esté 100 % pagado. No rige los últimos 07 días antes de la salida. 
+  Esta solicitud deberá realizarse por escrito vía correo electrónico a su asesor de viajes, con copia al encargado del grupo. La Agencia confirmará su recepción y asignará un número de caso, sin el cual la anulación no se considerará formalizada.</p>
+  <p><strong>j)</strong> Si con una antelación de 60 días a la salida del viaje el grupo no tuviera pagada la cantidad de pasajeros convenida, el valor del programa se adecuará al tramo que corresponda, debiendo los apoderados pagar las diferencias que puedan producirse, respetando siempre el mínimo de pasajeros establecidos.</p>
+
+  <h2>DÉCIMO SEGUNDO:</h2>
+  <p><strong>INCORPORACIÓN DE NUEVOS PASAJEROS (LISTA DE ESPERA).</strong></p>
+  <p>Toda solicitud de incorporación de nuevos alumnos o acompañantes una vez confirmada la nómina oficial del grupo será gestionada exclusivamente a través del procedimiento interno de Lista de Espera de TURISMO RAITRAI.
+  Dicho procedimiento contempla requisitos y condiciones específicas que serán informadas al solicitante al momento de iniciar el proceso, incluyendo —pero no limitado a— la disponibilidad de cupos, tiempos operativos, confirmación por parte de prestadores de servicios (aéreos y/o terrestres), y los valores vigentes al momento de la solicitud.
+  La inclusión en la Lista de Espera no implica aceptación automática, ni garantiza el mismo valor ni condiciones pactadas previamente para el grupo.
+  Cada solicitud será formalizada mediante la asignación de un número de caso, conforme al sistema interno de gestión de TURISMO RAITRAI.</p>
+
+  <h2>DÉCIMO TERCERO:</h2>
+  <p><strong>REGISTRO DE CASOS ESPECIALEES.</strong></p>
+  <p>Toda solicitud extraordinaria por parte del apoderado, participante o grupo que implique una modificación de los términos originalmente pactados será registrada por TURISMO RAITRAI bajo un sistema interno de gestión de casos, mediante la asignación de un número identificador único.
+  Cada caso será evaluado por el equipo correspondiente, y su aprobación quedará sujeta a las condiciones logísticas, contractuales y administrativas vigentes. La sola presentación de una solicitud no implica su aceptación, y toda resolución será informada por escrito al apoderado responsable y a los delegados del grupo.
+  </p>
+
+  <h2>DÉCIMO CUARTO:</h2>
+  <p><strong>FUERZA MAYOR O CASO FORTUITO.</strong></p>
+  <p>Ninguna de las partes será responsable del incumplimiento o demora en el desarrollo de sus obligaciones contractuales, en cuanto dicho incumplimiento, demora y/o Cancelación, sea el resultado de un caso fortuito, fuerza mayor o circunstancia fuera del control razonable de cada parte, incluyendo a modo de ejemplo: guerra, pandemias, disturbios civiles o disputas industriales, actos terroristas, huelga, actos de autoridad gubernamental, fenómenos climáticos, motivos de seguridad, actos de guerra y atentados terroristas de cualquier naturaleza, sucedidos en los países involucrados en el programa contratado y establecido en este contrato.
+  En caso de que cualquiera de las partes se vea impedida en el cumplimiento de sus obligaciones en razón de esta cláusula, TURISMO RAITRAI, en coordinación con LOS DELEGADOS, deberán acordar una nueva fecha para el viaje de estudios, si es que este no se ha iniciado y/o la mejor manera de dar continuidad al viaje si es que este ya se ha iniciado.
+  Respecto de los gastos adicionales que se produzcan, como consecuencia de algunos de los casos fortuitos o de fuerza mayor anteriormente mencionados, y que involucren la contratación de servicios adicionales no considerados en el programa originalmente contratado, será responsabilidad de los apoderados realizar el pago de estos servicios a TURISMO RAITRAI, de manera que estos puedan ser contratados y entregados oportunamente.
+  </p>
+
+  <h2>DÉCIMO QUINTO:</h2>
+  <p><strong>SOLUCIÓN Y CONTROVERSIAS.</strong></p>
+  <p>Toda dificultad que surja entre las partes sobre la validez, interpretación, cumplimiento o incumplimiento de este contrato será resuelta aplicando las leyes chilenas, por un árbitro arbitrador designado por ellas de común acuerdo; sin embargo, cada parte podrá solicitar por escrito la designación del árbitro a la Cámara de Comercio de Santiago A.G., de entre los árbitros que integren la nómina del Centro de Arbitrajes de dicha Cámara y conforme a su Reglamento, que las partes declaran conocer y aceptar. El árbitro queda especialmente facultado para resolver todo asunto relacionado con su competencia o jurisdicción. La sede del arbitraje será la ciudad de Santiago.</p>
+
+  <h2>DÉCIMO SEXTO:</h2>
+  <p><strong>COMPROMISO ÉTICO.</strong></p>
+  <p>Nuestra empresa declara su apoyo a la campaña iniciada desde hace algunos años por diversas entidades, tales como OTM, UNICEF o UNTWO, que tienen entre sus objetivos tomar iniciativas para resguardar la integridad física y moral de los seres humanos, especialmente de los menores, desarrollando las siguientes acciones:
+  1.	Nuestros paquetes turísticos NO promueven el turismo sexual en ninguna de sus vertientes. Diseñamos con cuidado nuestros programas, que están dirigidos y comercializados para grupos de estudiantes y familias.
+  2.	Adherirnos a las normativas legales referentes a materias sobre explotación de seres humanos, especialmente menores, tanto a nivel nacional como internacional.
+  3.	Formamos a nuestro personal en materia de prevención de la explotación de seres humanos, capacitándolos en las medidas de prevención que toma la empresa.
+  </p>
+
+  <h2>DÉCIMO SÉPTIMO:</h2>
+  <p><strong>PROTECCIÓN DE DATOS PERSONALES.</strong></p>
+  <p>El grupo y sus representantes autorizan expresamente a TURISMO RAITRAI LIMITADA a recolectar, almacenar y tratar los datos personales que sean necesarios para la correcta ejecución del presente contrato, conforme a la Ley Nº 19.628 sobre Protección de la Vida Privada.
+  Estos datos podrán ser utilizados únicamente para fines operativos, administrativos y de comunicación relacionados con el viaje contratado, incluyendo la entrega de información a prestadores de servicios turísticos (transportistas, hoteles, aseguradoras u otros) cuando sea necesario.
+  TURISMO RAITRAI se compromete a resguardar la confidencialidad de esta información, no cederla a terceros para fines distintos a los expresamente indicados, y permitir a los titulares ejercer sus derechos de acceso, rectificación, cancelación y oposición conforme a la ley.
+  </p>
+
+  <h2>DÉCIMO OCTAVO:</h2>
+  <p><strong>FECHA Y LUGAR DE SALIDA</strong></p>
+  <p>La salida del grupo para el cumplimiento del programa acordado se efectuará durante el año {{AÑO}}, desde {{LUGAR_SALIDA}}, en el mes de {{MES_VIAJE}} o según programación confirmada. El regreso se realizará al mismo punto de partida, en el mismo mes o en otro distinto, según corresponda al itinerario del grupo.
+
+  Cualquier ajuste en la fecha o lugar de regreso será informado por escrito. La confirmación oficial de la fecha de salida se realizará mediante correo electrónico a el o los encargados del grupo, y dicha comunicación tendrá validez contractual.
+  </p>
   
   <h2>DECIMO NOVENO</h2>
   <p>Para todos los efectos legales las partes fijan su domicilio en la ciudad de Santiago, comuna de Providencia. Se suscribe en DOS ejemplares, queda uno en poder de TURISMO RAITRAI  y otro en poder de los DELEGADOS del grupo curso.</p>
@@ -119,8 +205,8 @@
 
   <div class="firma">
     <p><strong>NOMBRE(S) Y APELLIDO(S)&emsp;&emsp;&emsp;&emsp;&emsp;RUT&emsp;&emsp;&emsp;&emsp;&emsp;FIRMA</strong></p>
-    <p>1. _____________________________________________________________</p>
-    <p>2. _____________________________________________________________</p>
+    <p>1. ___________________________________________________</p>
+    <p>2. ___________________________________________________</p>
   </div>
 
   <div class="firma">
