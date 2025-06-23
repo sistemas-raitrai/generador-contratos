@@ -62,7 +62,12 @@
         <option value="$USD">$USD</option>
         <option value="$CLP">$CLP</option>
       </select></label>
-      <label>Cuota Inscripción:<input type="text" id="CUOTA_INSCRIPCION" /></label>
+      <label>
+      Cuota Inscripción:
+      <input type="text" id="CUOTA_INSCRIPCION" />
+      <br>
+      <small><label><input type="checkbox" id="DIVIDIR_CUOTA" /> ¿Dividir en 2 pagos?</label></small>
+      </label>
       <label>Fecha Inscripción:<input type="date" id="FECHA_INICIO_PAGO" /></label>
       <label>Fecha Pago Final:<input type="date" id="FECHA_FIN_PAGO" /></label>
       <label>Número de Cuotas:<input type="number" id="NUM_CUOTAS" /></label>
@@ -146,8 +151,39 @@
           console.error("Error leyendo datos:", err);
           document.getElementById("estado").textContent = "❌ No se pudo cargar la base.";
         });
+    ["CUOTA_INSCRIPCION", "FECHA_INICIO_PAGO", "FECHA_FIN_PAGO", "DIVIDIR_CUOTA"].forEach(id => {
+      document.getElementById(id)?.addEventListener("change", calcularCuotas);
     });
+  });
 
+  function calcularCuotas() {
+    const parseMonto = val => parseInt((val || "").replace(/[^\d]/g, ""), 10) || 0;
+    const inicio = new Date(document.getElementById("FECHA_INICIO_PAGO").value);
+    const fin = new Date(document.getElementById("FECHA_FIN_PAGO").value);
+    const cuotaInscripcion = parseMonto(document.getElementById("CUOTA_INSCRIPCION").value);
+    const valorPrograma = parseMonto(document.getElementById("VALOR_PROGRAMA").value);
+    const dividir = document.getElementById("DIVIDIR_CUOTA")?.checked;
+
+    if (isNaN(inicio) || isNaN(fin) || !valorPrograma || !cuotaInscripcion) return;
+
+    const meses = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth()) + 1;
+    const totalCuotas = dividir ? meses + 1 : meses;
+    const restante = valorPrograma - cuotaInscripcion;
+
+    let valorMensual;
+    if (dividir) {
+      valorMensual = Math.round(restante / (meses - 1));
+    } else {
+      valorMensual = Math.round(restante / (meses));
+    }
+
+    document.getElementById("NUM_CUOTAS").value = totalCuotas;
+    document.getElementById("CUOTA_MENSUAL").value = valorMensual;
+    document.getElementById("MES_INICIO").value = inicio.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+    document.getElementById("ANO_INICIO").value = inicio.getFullYear();
+    document.getElementById("MES_FIN").value = fin.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+    document.getElementById("ANO_FIN").value = fin.getFullYear();
+  }
     // 🔘 Botón de generar contrato
     async function generarContrato() {
       const campos = [
