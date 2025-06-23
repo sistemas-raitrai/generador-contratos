@@ -158,13 +158,14 @@
       });
     });
 
+    // ✅ Función que calcula el número de cuotas y el valor mensual
     function calcularCuotas() {
       console.log("🔁 Iniciando cálculo de cuotas...");
     
       // 📌 Función auxiliar para limpiar montos con símbolos
       const parseMonto = val => parseFloat((val || '').replace(/[^\d.]/g, '')) || 0;
     
-      // 🔢 Obtener valores necesarios desde el DOM
+      // 🔢 Obtener valores desde el formulario
       const cuotaInscripcion = parseMonto(document.getElementById('CUOTA_INSCRIPCION').value);
       const valorPrograma = parseMonto(document.getElementById('VALOR_PROGRAMA').value);
       const dividir = document.getElementById('DIVIDIR_CUOTA')?.checked;
@@ -172,49 +173,49 @@
       const fechaInicioRaw = document.getElementById('FECHA_INICIO_PAGO').value;
       const fechaFinRaw = document.getElementById('FECHA_FIN_PAGO').value;
     
-      console.log("📅 Datos crudos:", { cuotaInscripcion, valorPrograma, fechaInicioRaw, fechaFinRaw });
-    
       const fechaInicio = new Date(fechaInicioRaw);
       const fechaFin = new Date(fechaFinRaw);
     
-      // 🚫 Validación básica
+      console.log("📦 Datos crudos:", {
+        cuotaInscripcion, valorPrograma, dividir, fechaInicio, fechaFin
+      });
+    
+      // 🚫 Validación de datos
       if (isNaN(fechaInicio) || isNaN(fechaFin) || !cuotaInscripcion || !valorPrograma) {
         console.warn("❌ Datos inválidos. Abortando cálculo.");
         return;
       }
     
-      // 📅 Clonar fechas
+      // 🗓️ Clonar fechas para no alterar las originales
       const inicio = new Date(fechaInicio);
       const fin = new Date(fechaFin);
     
-      // 🧮 Lógica de ajuste de inicio
-      const diaInicio = inicio.getDate();
-      console.log("📅 Día del inicio original:", diaInicio);
+      console.log("📅 Día del inicio original:", inicio.getDate());
     
-      if (diaInicio > 1) {
-        console.log("🔄 Día > 1, ajustando mes...");
+      // 📆 Ajustar el mes si el día no es 1 (por ejemplo, 2 de julio cuenta desde agosto)
+      if (inicio.getDate() > 1) {
         inicio.setMonth(inicio.getMonth() + 1);
         inicio.setDate(1);
-      } else {
-        console.log("✅ Día 1 exacto, no se ajusta el mes.");
+        console.log("📆 Día > 1, ajustando mes...");
       }
     
-      // 🔁 Cálculo de meses
-      const mesesPago = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth()) + 1;
-      console.log("📆 Meses de pago:", mesesPago);
+      // 📊 Calcular cantidad total de meses de pago
+      const mesesTotales = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth()) + 1;
+      console.log("📅 Meses de pago:", mesesTotales);
     
+      // ➗ Calcular número de cuotas reales (excluyendo inscripción)
+      const cuotasReales = dividir ? mesesTotales - 2 : mesesTotales - 1;
+    
+      // 💰 Calcular valor de cada cuota real
       const restante = valorPrograma - cuotaInscripcion;
-      const valorMensual = mesesPago > 0 ? (restante / mesesPago) : 0;
+      const valorMensual = cuotasReales > 0 ? (restante / cuotasReales) : 0;
     
-      console.log("💰 Cálculo final:", {
-        restante,
-        valorMensual,
-        cuotaInscripcion,
-        valorPrograma
+      console.log("🔥 Cálculo final:", {
+        cuotasReales, valorMensual
       });
     
-      // 🧾 Actualización en formulario
-      document.getElementById('NUM_CUOTAS').value = mesesPago;
+      // 📝 Actualizar valores en el formulario
+      document.getElementById('NUM_CUOTAS').value = cuotasReales;
       document.getElementById('CUOTA_MENSUAL').value = valorMensual.toFixed(2).replace('.', ',');
     
       document.getElementById('MES_INICIO').value = inicio.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
