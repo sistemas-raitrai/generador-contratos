@@ -267,6 +267,11 @@
       document.getElementById("estado").textContent = "⏳ Generando contrato…";
 
       try {
+       // ✅ Reemplazar comas por puntos en montos numéricos antes de enviar
+        ["CUOTA_MENSUAL", "CUOTA_INSCRIPCION", "VALOR_PROGRAMA"].forEach(key => {
+          if (data[key]) data[key] = data[key].replace(",", ".");
+        });
+        
         const res = await fetch("/api/generar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
