@@ -164,20 +164,20 @@
       const cuotaInscripcion = parseMonto(document.getElementById("CUOTA_INSCRIPCION").value);
       const valorPrograma = parseMonto(document.getElementById("VALOR_PROGRAMA").value);
       const dividir = document.getElementById("DIVIDIR_CUOTA")?.checked;
-
+    
       const fechaInicioRaw = document.getElementById("FECHA_INICIO_PAGO").value;
       const fechaFinRaw = document.getElementById("FECHA_FIN_PAGO").value;
     
-      const fechaInicio = new Date(document.getElementById("FECHA_INICIO_PAGO").value);
-      const fechaFin = new Date(document.getElementById("FECHA_FIN_PAGO").value);
+      const fechaInicio = new Date(fechaInicioRaw);
+      const fechaFin = new Date(fechaFinRaw);
     
       // Validación básica
       if (isNaN(fechaInicio) || isNaN(fechaFin) || !cuotaInscripcion || !valorPrograma) return;
     
       // 🔁 Calcular meses reales de pago mensual (sin contar inscripción)
-      const mesesPago = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth()) + 1;
+      const mesesPago = (fechaFin.getFullYear() - fechaInicio.getFullYear()) * 12 +
+                        (fechaFin.getMonth() - fechaInicio.getMonth()) + 1;
     
-      // 💰 Calcular valor mensual (valor programa menos inscripción dividido por meses de pago)
       const restante = valorPrograma - cuotaInscripcion;
       const valorMensual = mesesPago > 0 ? (restante / mesesPago) : 0;
     
@@ -185,13 +185,13 @@
       document.getElementById("NUM_CUOTAS").value = mesesPago;
       document.getElementById("CUOTA_MENSUAL").value = valorMensual.toFixed(2).replace(".", ",");
     
-      // ✅ Mostrar el mes y año de la fecha de inscripción (como solicitaste explícitamente)
-      document.getElementById("MES_INICIO").value = inicio.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
-      document.getElementById("ANO_INICIO").value = inicio.getFullYear();
+      document.getElementById("MES_INICIO").value = fechaInicio.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+      document.getElementById("ANO_INICIO").value = fechaInicio.getFullYear();
     
-      document.getElementById("MES_FIN").value = fin.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
-      document.getElementById("ANO_FIN").value = fin.getFullYear();
+      document.getElementById("MES_FIN").value = fechaFin.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+      document.getElementById("ANO_FIN").value = fechaFin.getFullYear();
     }
+
     // 🔘 Botón de generar contrato
     async function generarContrato() {
       const campos = [
