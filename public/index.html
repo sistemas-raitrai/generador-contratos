@@ -159,6 +159,8 @@
     });
 
     function calcularCuotas() {
+      console.log("🔁 Iniciando cálculo de cuotas...");
+    
       // 📌 Función auxiliar para limpiar montos con símbolos
       const parseMonto = val => parseFloat((val || '').replace(/[^\d.]/g, '')) || 0;
     
@@ -170,30 +172,48 @@
       const fechaInicioRaw = document.getElementById('FECHA_INICIO_PAGO').value;
       const fechaFinRaw = document.getElementById('FECHA_FIN_PAGO').value;
     
+      console.log("📅 Datos crudos:", { cuotaInscripcion, valorPrograma, fechaInicioRaw, fechaFinRaw });
+    
       const fechaInicio = new Date(fechaInicioRaw);
       const fechaFin = new Date(fechaFinRaw);
     
-      // 🚫 Validación básica: no seguir si algún dato es inválido
-      if (isNaN(fechaInicio) || isNaN(fechaFin) || !cuotaInscripcion || !valorPrograma) return;
+      // 🚫 Validación básica
+      if (isNaN(fechaInicio) || isNaN(fechaFin) || !cuotaInscripcion || !valorPrograma) {
+        console.warn("❌ Datos inválidos. Abortando cálculo.");
+        return;
+      }
     
-      // 📅 Clonar fechas para evitar mutaciones
+      // 📅 Clonar fechas
       const inicio = new Date(fechaInicio);
       const fin = new Date(fechaFin);
     
-      // 📆 Ajustar el inicio si NO ES el día 1 (por ejemplo, si es 2 de julio, entonces parte el mes siguiente)
-      if (inicio.getDate() > 1) {
+      // 🧮 Lógica de ajuste de inicio
+      const diaInicio = inicio.getDate();
+      console.log("📅 Día del inicio original:", diaInicio);
+    
+      if (diaInicio > 1) {
+        console.log("🔄 Día > 1, ajustando mes...");
         inicio.setMonth(inicio.getMonth() + 1);
-        inicio.setDate(1); // forzamos día 1 del mes siguiente
+        inicio.setDate(1);
+      } else {
+        console.log("✅ Día 1 exacto, no se ajusta el mes.");
       }
     
-      // 🔁 Calcular número de meses entre fechas ajustadas
+      // 🔁 Cálculo de meses
       const mesesPago = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth()) + 1;
+      console.log("📆 Meses de pago:", mesesPago);
     
-      // 💰 Calcular monto mensual si hay meses válidos
       const restante = valorPrograma - cuotaInscripcion;
       const valorMensual = mesesPago > 0 ? (restante / mesesPago) : 0;
     
-      // 🧾 Actualizar valores en el formulario
+      console.log("💰 Cálculo final:", {
+        restante,
+        valorMensual,
+        cuotaInscripcion,
+        valorPrograma
+      });
+    
+      // 🧾 Actualización en formulario
       document.getElementById('NUM_CUOTAS').value = mesesPago;
       document.getElementById('CUOTA_MENSUAL').value = valorMensual.toFixed(2).replace('.', ',');
     
@@ -201,8 +221,9 @@
       document.getElementById('ANO_INICIO').value = inicio.getFullYear();
       document.getElementById('MES_FIN').value = fin.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
       document.getElementById('ANO_FIN').value = fin.getFullYear();
+    
+      console.log("✅ Cálculo terminado y actualizado.");
     }
-
     // 🔘 Botón de generar contrato
     async function generarContrato() {
       const campos = [
