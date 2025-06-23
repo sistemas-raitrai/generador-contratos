@@ -151,10 +151,12 @@
           console.error("Error leyendo datos:", err);
           document.getElementById("estado").textContent = "❌ No se pudo cargar la base.";
         });
-    ["CUOTA_INSCRIPCION", "FECHA_INICIO_PAGO", "FECHA_FIN_PAGO", "DIVIDIR_CUOTA"].forEach(id => {
+      
+      // 🔁 Escucha cambios para recalcular cuotas
+      ["CUOTA_INSCRIPCION", "FECHA_INICIO_PAGO", "FECHA_FIN_PAGO", "DIVIDIR_CUOTA"].forEach(id => {
       document.getElementById(id)?.addEventListener("change", calcularCuotas);
+      });
     });
-  });
 
   function calcularCuotas() {
     const parseMonto = val => parseInt((val || "").replace(/[^\d]/g, ""), 10) || 0;
