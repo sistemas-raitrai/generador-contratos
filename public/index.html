@@ -159,50 +159,48 @@
     });
 
     function calcularCuotas() {
-      const parseMonto = val => parseFloat((val || "").replace(/[^\d.]/g, "")) || 0;
+      // 📌 Función auxiliar para limpiar montos con símbolos
+      const parseMonto = val => parseFloat((val || '').replace(/[^\d.]/g, '')) || 0;
     
-      const cuotaInscripcion = parseMonto(document.getElementById("CUOTA_INSCRIPCION").value);
-      const valorPrograma = parseMonto(document.getElementById("VALOR_PROGRAMA").value);
-      const dividir = document.getElementById("DIVIDIR_CUOTA")?.checked;
+      // 🔢 Obtener valores necesarios desde el DOM
+      const cuotaInscripcion = parseMonto(document.getElementById('CUOTA_INSCRIPCION').value);
+      const valorPrograma = parseMonto(document.getElementById('VALOR_PROGRAMA').value);
+      const dividir = document.getElementById('DIVIDIR_CUOTA')?.checked;
     
-      const fechaInicioRaw = document.getElementById("FECHA_INICIO_PAGO").value;
-      const fechaFinRaw = document.getElementById("FECHA_FIN_PAGO").value;
+      const fechaInicioRaw = document.getElementById('FECHA_INICIO_PAGO').value;
+      const fechaFinRaw = document.getElementById('FECHA_FIN_PAGO').value;
     
-      const fechaInscripcion = new Date(fechaInicioRaw);
+      const fechaInicio = new Date(fechaInicioRaw);
       const fechaFin = new Date(fechaFinRaw);
     
-      // 🛑 Validación de campos
-      if (isNaN(fechaInscripcion) || isNaN(fechaFin) || !cuotaInscripcion || !valorPrograma) return;
+      // 🚫 Validación básica: no seguir si algún dato es inválido
+      if (isNaN(fechaInicio) || isNaN(fechaFin) || !cuotaInscripcion || !valorPrograma) return;
     
-      // 🔁 Ajuste de fecha de inicio de pago mensual
-      const fechaInicioMensual = new Date(fechaInscripcion);
-      if (dividir) {
-        // Si se divide en dos pagos, los pagos mensuales comienzan dos meses después
-        fechaInicioMensual.setMonth(fechaInicioMensual.getMonth() + 2);
-      } else {
-        // Si no se divide, los pagos comienzan un mes después
-        fechaInicioMensual.setMonth(fechaInicioMensual.getMonth() + 1);
+      // 📅 Clonar fechas para evitar mutaciones
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
+    
+      // 📆 Ajustar el inicio si NO ES el día 1 (por ejemplo, si es 2 de julio, entonces parte el mes siguiente)
+      if (inicio.getDate() > 1) {
+        inicio.setMonth(inicio.getMonth() + 1);
+        inicio.setDate(1); // forzamos día 1 del mes siguiente
       }
     
-      // 📆 Cálculo de número de cuotas mensuales reales (sin inscripción)
-      const mesesPago = (fechaFin.getFullYear() - fechaInicioMensual.getFullYear()) * 12 +
-                        (fechaFin.getMonth() - fechaInicioMensual.getMonth()) + 1;
+      // 🔁 Calcular número de meses entre fechas ajustadas
+      const mesesPago = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth()) + 1;
     
-      // 💲 Cálculo del valor mensual (restante dividido por cuotas reales)
+      // 💰 Calcular monto mensual si hay meses válidos
       const restante = valorPrograma - cuotaInscripcion;
       const valorMensual = mesesPago > 0 ? (restante / mesesPago) : 0;
     
-      // ✍️ Actualización de campos en el formulario
-      document.getElementById("NUM_CUOTAS").value = mesesPago;
-      document.getElementById("CUOTA_MENSUAL").value = valorMensual.toFixed(2).replace(".", ",");
+      // 🧾 Actualizar valores en el formulario
+      document.getElementById('NUM_CUOTAS').value = mesesPago;
+      document.getElementById('CUOTA_MENSUAL').value = valorMensual.toFixed(2).replace('.', ',');
     
-      // 📅 Mostrar mes y año de la inscripción (no del inicio de pagos)
-      document.getElementById("MES_INICIO").value = fechaInscripcion.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
-      document.getElementById("ANO_INICIO").value = fechaInscripcion.getFullYear();
-    
-      // 📅 Mostrar mes y año del fin de pagos
-      document.getElementById("MES_FIN").value = fechaFin.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
-      document.getElementById("ANO_FIN").value = fechaFin.getFullYear();
+      document.getElementById('MES_INICIO').value = inicio.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+      document.getElementById('ANO_INICIO').value = inicio.getFullYear();
+      document.getElementById('MES_FIN').value = fin.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+      document.getElementById('ANO_FIN').value = fin.getFullYear();
     }
 
     // 🔘 Botón de generar contrato
