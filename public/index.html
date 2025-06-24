@@ -416,7 +416,11 @@
         const nombre = div.querySelector(".nombreFirmante")?.value.trim();
         const rut = div.querySelector(".rutFirmante")?.value.trim();
         return nombre && rut
-          ? `<p>${i + 1}. ${nombre} &emsp; ${rut} &emsp;&emsp;&emsp;&emsp; ___________________</p>`
+          ? `<tr>
+               <td style="padding: 6px 10px;">${i + 1}. ${nombre}</td>
+               <td style="padding: 6px 10px;">${rut}</td>
+               <td style="padding: 6px 10px;">___________________</td>
+             </tr>`
           : null;
       }).filter(Boolean).join("");
 
