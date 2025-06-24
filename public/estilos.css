@@ -74,3 +74,8 @@ pre {
   margin-top: 1.5rem;
   font-size: 0.95rem;
 }
+
+#nombreGrupo {
+  width: 100%;
+  min-width: 300px;
+}
