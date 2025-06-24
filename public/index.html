@@ -72,8 +72,15 @@
       <label>Pax Liberados:<input type="text" id="PAX_LIBERADOS" /></label>
 
       <label>Valor del Programa:<input type="text" id="VALOR_PROGRAMA" /></label>
-      <label>Cuota Inscripción:<input type="text" id="CUOTA_INSCRIPCION" /></label>
-      <label><small><input type="checkbox" id="DIVIDIR_CUOTA" /> ¿Dividir en 2 pagos?</small></label>
+      <label style="grid-column: span 1;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Cuota Inscripción:</span>
+          <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.25rem; margin: 0;">
+            <input type="checkbox" id="DIVIDIR_CUOTA" /> ¿2 pagos?
+          </label>
+        </div>
+        <input type="text" id="CUOTA_INSCRIPCION" />
+      </label>
       
       <label>Día de Pago Mensual:<input type="number" id="DIA_PAGO" /></label>
       <label>Fecha Inicio de Pago:<input type="date" id="FECHA_INICIO_PAGO" /></label>
