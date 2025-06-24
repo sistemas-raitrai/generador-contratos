@@ -52,9 +52,9 @@
     <!-- Datos del contrato -->
     <h2>Datos del Contrato</h2>
     <div class="grid">
-      <label>Curso:<input type="text" id="CURSO" /></label>
+      <label>Curso (al momento del viaje):<input type="text" id="CURSO" /></label>
       <label>Colegio:<input type="text" id="COLEGIO" /></label>
-      <label>Año:<input type="number" id="AÑO" /></label>
+      <label>Año de Viaje:<input type="number" id="AÑO" /></label>
 
       <label>Comuna:<input type="text" id="COMUNA" /></label>
       <label>Cantidad de Pax:<input type="number" id="PAX_MIN" /></label>
@@ -168,6 +168,13 @@
                 const v = el.value.trim();
                 const row = rows.find(r => String(r.numeroNegocio) === v || r.nombreGrupo === v);
                 if (!row) return;
+
+                // Completar el otro campo si se seleccionó por uno solo
+                if (el.id === "nombreGrupo" && row.numeroNegocio) {
+                  document.getElementById("numeroNegocio").value = row.numeroNegocio;
+                } else if (el.id === "numeroNegocio" && row.nombreGrupo) {
+                  document.getElementById("nombreGrupo").value = row.nombreGrupo;
+                }
     
                 // 🎯 Extraer nombre del colegio, curso y año (últimos)
                 const partes = [...row.nombreGrupo.matchAll(/(\d+\w?)\s*\((\d{4})\)/g)];
