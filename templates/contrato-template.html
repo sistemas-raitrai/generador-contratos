@@ -224,9 +224,19 @@
   <p>En comprobante, previa lectura firman y ratifican como representante del grupo.</p>
 
   <div class="firma">
-    <p><strong>NOMBRE(S) Y APELLIDO(S)&emsp;&emsp;&emsp;&emsp;&emsp;RUT&emsp;&emsp;&emsp;&emsp;&emsp;FIRMA</strong></p>
-    {{{firmantes}}}  
-  </div>
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th style="text-align:left;">NOMBRE(S) Y APELLIDO(S)</th>
+          <th style="text-align:left;">RUT</th>
+          <th style="text-align:left;">FIRMA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{firmantes}}
+      </tbody>
+    </table>
+   </div>
 
   <div class="firma">
     <p><strong>POR TURISMO RAITRAI</strong></p>
