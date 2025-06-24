@@ -339,7 +339,7 @@
     
       const nuevaInscripcion = valorPrograma - (cuotaMensual * cuotas);
       if (nuevaInscripcion >= 0) {
-        document.getElementById('CUOTA_INSCRIPCION').value = nuevaInscripcion.toFixed(2).replace('.', ',');
+        document.getElementById('CUOTA_INSCRIPCION').value = Math.round(nuevaInscripcion);
       }
     });
 
