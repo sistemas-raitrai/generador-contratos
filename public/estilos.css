@@ -126,3 +126,17 @@ pre {
   width: 100%;
   min-width: 300px;
 }
+
+.firmante {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.nombreFirmante {
+  flex: 2;
+}
+
+.rutFirmante {
+  flex: 1;
+}
