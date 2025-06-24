@@ -148,12 +148,17 @@
                 const row = rows.find(r => String(r.numeroNegocio) === v || r.nombreGrupo === v);
                 if (!row) return;
     
-                // 🎯 Extraer datos del grupo
-                const m = row.nombreGrupo.match(/^(.+?)\s*(?:\(\d{4}\))?(?:\s*-\s*)?(\d+\w?)\s*\((\d{4})\)/);
-                if (m) {
-                  document.getElementById("COLEGIO").value = m[1];
-                  document.getElementById("CURSO").value   = m[2];
-                  document.getElementById("AÑO").value     = m[3];
+                // 🎯 Extraer nombre del colegio, curso y año (últimos)
+                const partes = [...row.nombreGrupo.matchAll(/(\d+\w?)\s*\((\d{4})\)/g)];
+                const ultima = partes.at(-1); // ✅ Tomar la última coincidencia
+                
+                if (ultima) {
+                  // 🏫 Extraer colegio eliminando los cursos con años entre paréntesis
+                  const nombreLimpio = row.nombreGrupo.replace(/\s*\d+\w?\s*\(\d{4}\)/g, "").replace(/\s*-\s*$/, "").trim();
+                  
+                  document.getElementById("COLEGIO").value = nombreLimpio;
+                  document.getElementById("CURSO").value = ultima[1]; // Ej: 3B
+                  document.getElementById("AÑO").value   = ultima[2]; // Ej: 2026
                 }
     
                 // 📥 Rellenar todos los campos con la información correspondiente
