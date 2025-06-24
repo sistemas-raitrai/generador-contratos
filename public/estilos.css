@@ -67,7 +67,7 @@ textarea {
 /* Estilos internos del grid */
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem 2rem; /* espacio entre filas y columnas */
 }
 
