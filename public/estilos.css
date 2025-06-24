@@ -74,10 +74,8 @@ textarea {
 .grid label {
   display: flex;
   flex-direction: column;
-  padding: 0.25rem 0.5rem;
-  background: #fff;
-  border-radius: 4px;
-  box-shadow: 0 0 0 1px #ccc inset;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 /* Ocultos */
