@@ -137,6 +137,18 @@
 
     // 🔁 Carga de grupos y configuración de autocompletado robusto
     window.addEventListener("DOMContentLoaded", () => {
+      // ✅ Si hay parámetro ?numero= en la URL, autocompletar
+      const params = new URLSearchParams(window.location.search);
+      const numeroPredefinido = params.get("numero");
+      if (numeroPredefinido) {
+        const input = document.getElementById("numeroNegocio");
+        input.value = numeroPredefinido;
+      
+        // 🔁 Forzar disparar el evento de input para que se active el autocompletado
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      
       // 🕒 Establecer la fecha actual en el campo "Fecha del Contrato"
       const hoy = new Date();
       const mañana = new Date();
