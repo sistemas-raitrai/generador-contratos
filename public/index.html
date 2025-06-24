@@ -165,6 +165,15 @@
           }
         });
       });
+      
+      // ✅ Escucha cambios para recalcular cuotas automáticamente
+      ["CUOTA_INSCRIPCION", "FECHA_INICIO_PAGO", "FECHA_FIN_PAGO", "DIVIDIR_CUOTA"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener("input", calcularCuotas);
+          el.addEventListener("change", calcularCuotas);
+        }
+      });
     });
     // ✅ Función que calcula el número de cuotas y el valor mensual
     function calcularCuotas() {
