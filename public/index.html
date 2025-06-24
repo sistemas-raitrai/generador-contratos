@@ -96,7 +96,7 @@
           <span>Cuota Inscripción:</span>
           <span style="display: flex; align-items: center; font-size: 0.85rem; gap: 0.25rem;">
             <input type="checkbox" id="DIVIDIR_CUOTA" />
-            Dividida
+            Dividir
           </span>
         </div>
         <input type="text" id="CUOTA_INSCRIPCION" />
@@ -138,8 +138,13 @@
     // 🔁 Carga de grupos y configuración de autocompletado robusto
     window.addEventListener("DOMContentLoaded", () => {
       // 🕒 Establecer la fecha actual en el campo "Fecha del Contrato"
-      const hoy = new Date().toISOString().split('T')[0];
-      document.getElementById("FECHA_CONTRATO").value = hoy;
+      const hoy = new Date();
+      const mañana = new Date();
+      mañana.setDate(hoy.getDate() + 1);
+      
+      document.getElementById("FECHA_CONTRATO").value = hoy.toISOString().split("T")[0];
+      document.getElementById("FECHA_INICIO_PAGO").value = hoy.toISOString().split("T")[0];
+      document.getElementById("FECHA_FIN_PAGO").value = mañana.toISOString().split("T")[0];
           
       fetch(sheetURL)
         .then(r => r.ok ? r.json() : Promise.reject(r.status))
@@ -213,6 +218,14 @@
           el.addEventListener("change", calcularCuotas);
         }
       });
+      // ✅ Actualizar automáticamente FECHA_CORTE al cambiar el año
+      document.getElementById("AÑO").addEventListener("input", () => {
+        const año = parseInt(document.getElementById("AÑO").value);
+        if (!isNaN(año)) {
+          const fechaCorte = new Date(año, 2, 15); // 15 de marzo (mes 2, indexado desde 0)
+          document.getElementById("FECHA_CORTE").value = fechaCorte.toISOString().split("T")[0];
+        }
+      });    
     });
     // ✅ Función que calcula el número de cuotas y el valor mensual
     function calcularCuotas() {
