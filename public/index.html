@@ -35,8 +35,9 @@
     <h2>Definiciones del Contrato</h2>
     <div class="grid">
       <label style="grid-column: span 2;">Email destinatario:
-        <input list="emailList" id="DEST_EMAIL placeholder="Ingresa o Selecciona correo electrónico" />
+        <input list="emailList" id="DEST_EMAIL" />
         <datalist id="emailList">
+          <option value="">Selecciona o Ingresa tu correo electrónico</option>
           <option value="nachopastorpino@gmail.com">
           <option value="griveros@raitrai.cl">
           <option value="cgayoso@raitrai.cl">
@@ -87,7 +88,7 @@
       <label>Fecha Inicio de Pago:<input type="date" id="FECHA_INICIO_PAGO" /></label>
       <label>Fecha Término de Pago:<input type="date" id="FECHA_FIN_PAGO" /></label>
       
-      <label>Fecha Límite Incorporaciones:<input type="date" id="FECHA_CORTE" /></label>
+      <label>Fecha límite de incorporaciones:<input type="date" id="FECHA_CORTE" /></label>
       <label>Número de Cuotas:<input type="number" id="NUM_CUOTAS" /></label>
       <label>Valor de Cuota:<input type="text" id="CUOTA_MENSUAL" /></label>
       
