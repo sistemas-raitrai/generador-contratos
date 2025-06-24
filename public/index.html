@@ -380,6 +380,10 @@
       data.VALOR_PROGRAMA1 = data.VALOR_PROGRAMA;
       data.CUOTA_INSCRIPCION1 = data.CUOTA_INSCRIPCION;
 
+      data.AQUI = document.getElementById("DIVIDIR_CUOTA").checked
+        ? " (dividida en dos partes que se pagarán como concepto de cuota mensual en los primeros dos pagos), "
+        : "";
+
       data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div => ({
         titulo: div.querySelector("input[name=titulo]").value,
         texto: div.querySelector("textarea[name=texto]").value
