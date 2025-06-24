@@ -127,7 +127,7 @@
 
     <!-- Botones -->
     <div class="botones">
-      <button onclick="generarContrato()">📄 Descargar Contrato</button>
+      <button onclick="validarYGenerar()">📄 Descargar Contrato</button>
     </div>
     <div id="estado" style="margin-top:1rem;font-style:italic;color:#c0392b;"></div>
   </div>
@@ -313,6 +313,32 @@
       return fecha.toLocaleDateString('es-CL', opciones);
     }
     
+    // 🔘 Validar campos
+    function validarYGenerar() {
+      const ignorar = ["DIVIDIR_CUOTA"];
+      const inputs = document.querySelectorAll("input, select, textarea");
+      let camposIncompletos = [];
+    
+      inputs.forEach(el => {
+        const id = el.id;
+        if (!id || ignorar.includes(id)) return;
+    
+        const visible = el.offsetParent !== null; // está visible en pantalla
+        const requerido = el.type !== "hidden" && el.type !== "checkbox";
+    
+        if (requerido && visible && !el.value.trim()) {
+          camposIncompletos.push(id);
+        }
+      });
+    
+      if (camposIncompletos.length > 0) {
+        alert("⚠️ Faltan campos por completar:\n" + camposIncompletos.join(", "));
+        return;
+      }
+    
+      generarContrato(); // Si pasa la validación, genera el contrato
+    }
+   
     // 🔘 Botón de generar contrato
     async function generarContrato() {
       const campos = [
