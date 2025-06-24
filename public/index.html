@@ -6,10 +6,12 @@
   <title>Generador de Contratos</title>
   <link rel="stylesheet" href="/estilos.css" />
   <link rel="icon" href="/logo.png" />
+  <style>
+    .oculto { display: none !important; }
+  </style>
 </head>
 <body>
   <div class="contenedor">
-
     <!-- 1) Encabezado -->
     <div style="background:#fff;padding:1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ccc;">
       <div style="display:flex;align-items:center;">
@@ -33,6 +35,27 @@
     </label>
     <datalist id="grupoList"></datalist>
 
+    <!-- Definiciones del contrato -->
+    <h2>Definiciones del Contrato</h2>
+    <label>Email destinatario:
+      <input list="emailList" id="DEST_EMAIL" />
+    </label>
+    <datalist id="emailList">
+      <option value="nachopastorpino@gmail.com">
+      <option value="griveros@raitrai.cl">
+      <option value="cgayoso@raitrai.cl">
+      <option value="crojas@raitrai.cl">
+      <option value="orietta@raitrai.cl">
+      <option value="elagos@raitrai.cl">
+      <option value="aflores@raitrai.cl">
+      <option value="chernandez@raitrai.cl">
+    </datalist>
+    <label>Moneda:<select id="MONEDA">
+      <option value="">Selecciona moneda</option>
+      <option value="$USD">$USD</option>
+      <option value="$CLP">$CLP</option>
+    </select></label>
+
     <!-- 3) Datos del contrato -->
     <h2>Datos del Contrato</h2>
     <div class="grid">
@@ -44,24 +67,6 @@
       <label>Valor del Programa:<input type="text" id="VALOR_PROGRAMA" /></label>
       <label>Cantidad de Pax:<input type="number" id="PAX_MIN" /></label>
       <label>Pax Liberados:<input type="text" id="PAX_LIBERADOS" /></label>
-      <label>Email destinatario:
-        <input list="emailList" id="DEST_EMAIL" />
-      </label>
-      <datalist id="emailList">
-        <option value="nachopastorpino@gmail.com">
-        <option value="griveros@raitrai.cl">
-        <option value="cgayoso@raitrai.cl">
-        <option value="crojas@raitrai.cl">
-        <option value="orietta@raitrai.cl">
-        <option value="elagos@raitrai.cl">
-        <option value="aflores@raitrai.cl">
-        <option value="chernandez@raitrai.cl">
-      </datalist>
-      <label>Moneda:<select id="MONEDA">
-        <option value="">Selecciona moneda</option>
-        <option value="$USD">$USD</option>
-        <option value="$CLP">$CLP</option>
-      </select></label>
       <label>
       Cuota Inscripción:
       <input type="text" id="CUOTA_INSCRIPCION" />
@@ -72,10 +77,10 @@
       <label>Fecha Término de Pago:<input type="date" id="FECHA_FIN_PAGO" /></label>
       <label>Número de Cuotas:<input type="number" id="NUM_CUOTAS" /></label>
       <label>Valor de Cuota:<input type="text" id="CUOTA_MENSUAL" /></label>
-      <label>Mes Inicio Pago:<input type="text" id="MES_INICIO" /></label>
-      <label>Año Inicio Pago:<input type="number" id="ANO_INICIO" /></label>
-      <label>Mes Fin Pago:<input type="text" id="MES_FIN" /></label>
-      <label>Año Fin Pago:<input type="number" id="ANO_FIN" /></label>
+      <label class="oculto">Mes Inicio Pago:<input type="text" id="MES_INICIO" /></label>
+      <label class="oculto">Año Inicio Pago:<input type="number" id="ANO_INICIO" /></label>
+      <label class="oculto">Mes Fin Pago:<input type="text" id="MES_FIN" /></label>
+      <label class="oculto">Año Fin Pago:<input type="number" id="ANO_FIN" /></label>
       <label>Día de Pago Mensual:<input type="number" id="DIA_PAGO" /></label>
       <label>Fecha Límite:<input type="date" id="FECHA_CORTE" /></label>
       <label>Mes del Viaje:<input type="text" id="MES_VIAJE" /></label>
@@ -85,7 +90,7 @@
     <!-- ⛔ Campos ocultos solo para el correo -->
     <input type="hidden" id="AUTORIZACION" />
     <input type="hidden" id="DESCUENTO" />
-    <input type="hidden" id="nombreGrupo" /> <!-- ✅ Este es nuevo -->
+    <input type="hidden" id="nombreGrupo" />
 
     <!-- 4) Cláusulas adicionales -->
     <h2>Cláusulas adicionales</h2>
@@ -152,11 +157,14 @@
           document.getElementById("estado").textContent = "❌ No se pudo cargar la base.";
         });
       
-      // 🔁 Escucha cambios para recalcular cuotas
-      ["CUOTA_INSCRIPCION", "FECHA_INICIO_PAGO", "FECHA_FIN_PAGO", "DIVIDIR_CUOTA"].forEach(id => {
-      document.getElementById(id)?.addEventListener("change", calcularCuotas);
+      // 🔠 Forzar mayúsculas en todos los inputs de texto, textareas y selects
+      document.querySelectorAll("input[type=text], input[list], textarea, select").forEach(el => {
+        el.addEventListener("input", () => {
+          if (el.type === "text" || el.tagName === "TEXTAREA") {
+            el.value = el.value.toUpperCase();
+          }
+        });
       });
-    });
 
     // ✅ Función que calcula el número de cuotas y el valor mensual
     function calcularCuotas() {
