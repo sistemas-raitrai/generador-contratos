@@ -38,11 +38,15 @@ textarea {
   border-radius: 4px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem 2rem; /* fila y columna */
+.grid label {
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem 0.5rem;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px #ccc inset;
 }
+
 
 button {
   padding: 10px 16px;
@@ -77,4 +81,13 @@ pre {
 #nombreGrupo {
   width: 100%;
   min-width: 300px;
+}
+
+.grid label {
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem 0.5rem;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px #ccc inset;
 }
