@@ -59,6 +59,14 @@
     <!-- Datos del contrato -->
     <h2>Datos del Contrato</h2>
     <div class="grid">
+      <label>Curso:<input type="text" id="CURSO" /></label>
+      <label>Colegio:<input type="text" id="COLEGIO" /></label>
+      <label>Año:<input type="number" id="AÑO" /></label>
+
+      <label>Comuna:<input type="text" id="COMUNA" /></label>
+      <label>Cantidad de Pax:<input type="number" id="PAX_MIN" /></label>
+      <label>Pax Liberados:<input type="text" id="PAX_LIBERADOS" /></label>
+      
       <label>Fecha del Contrato:<input type="date" id="FECHA_CONTRATO" /></label>
       <label>Mes del Viaje:
         <select id="MES_VIAJE">
@@ -80,14 +88,6 @@
       <label>Lugar de Salida:
         <input type="text" id="LUGAR_SALIDA" value="AEROPUERTO DE SANTIAGO" />
       </label>
-
-      <label>Curso:<input type="text" id="CURSO" /></label>
-      <label>Colegio:<input type="text" id="COLEGIO" /></label>
-      <label>Año:<input type="number" id="AÑO" /></label>
-
-      <label>Comuna:<input type="text" id="COMUNA" /></label>
-      <label>Cantidad de Pax:<input type="number" id="PAX_MIN" /></label>
-      <label>Pax Liberados:<input type="text" id="PAX_LIBERADOS" /></label>
 
       <label>Valor del Programa:<input type="text" id="VALOR_PROGRAMA" /></label>
       <label style="grid-column: span 1;">
@@ -136,6 +136,10 @@
 
     // 🔁 Carga de grupos y configuración de autocompletado robusto
     window.addEventListener("DOMContentLoaded", () => {
+      // 🕒 Establecer la fecha actual en el campo "Fecha del Contrato"
+      const hoy = new Date().toISOString().split('T')[0];
+      document.getElementById("FECHA_CONTRATO").value = hoy;
+          
       fetch(sheetURL)
         .then(r => r.ok ? r.json() : Promise.reject(r.status))
         .then(rows => {
