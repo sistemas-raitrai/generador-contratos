@@ -34,7 +34,7 @@
     <!-- Definiciones del contrato -->
     <h2>Definiciones del Contrato</h2>
     <div class="grid">
-      <label style="grid-column: span 2;">Email destinatario:
+      <label style="grid-column: span 3;">Email destinatario:
         <input list="emailList" id="DEST_EMAIL" />
         <datalist id="emailList">
           <option value="nachopastorpino@gmail.com">
@@ -46,13 +46,6 @@
           <option value="aflores@raitrai.cl">
           <option value="chernandez@raitrai.cl">
         </datalist>
-      </label>
-      <label style="grid-column: span 1;">Moneda:
-        <select id="MONEDA">
-          <option value="">Selecciona moneda</option>
-          <option value="$USD">$USD</option>
-          <option value="$CLP">$CLP</option>
-        </select>
       </label>
     </div>
 
@@ -89,6 +82,14 @@
         <input type="text" id="LUGAR_SALIDA" value="AEROPUERTO DE SANTIAGO" />
       </label>
 
+      <label>Moneda:
+        <select id="MONEDA">
+          <option value="">Selecciona moneda</option>
+          <option value="$USD">$USD</option>
+          <option value="$CLP">$CLP</option>
+        </select>
+      </label>
+
       <label>Valor del Programa:<input type="text" id="VALOR_PROGRAMA" /></label>
       <label style="grid-column: span 1;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -101,13 +102,13 @@
         <input type="text" id="CUOTA_INSCRIPCION" />
       </label>
       
-      <label>Día de Pago Mensual:<input type="number" id="DIA_PAGO" /></label>
       <label>Fecha Inicio de Pago:<input type="date" id="FECHA_INICIO_PAGO" /></label>
       <label>Fecha Término de Pago:<input type="date" id="FECHA_FIN_PAGO" /></label>
       
       <label>Fecha límite de incorporaciones:<input type="date" id="FECHA_CORTE" /></label>
       <label>Número de Cuotas:<input type="number" id="NUM_CUOTAS" /></label>
       <label>Valor de Cuota:<input type="text" id="CUOTA_MENSUAL" /></label>
+      <label>Día de Pago Mensual:<input type="number" id="DIA_PAGO" /></label>
       
       <label class="oculto">Mes Inicio Pago:<input type="text" id="MES_INICIO" /></label>
       <label class="oculto">Año Inicio Pago:<input type="number" id="ANO_INICIO" /></label>
