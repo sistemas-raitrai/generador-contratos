@@ -7,98 +7,116 @@
   <link rel="stylesheet" href="/estilos.css" />
   <link rel="icon" href="/logo.png" />
   <style>
+    body { font-family: 'Arial', sans-serif; background: #f8f8f8; margin: 0; padding: 0; }
+    .contenedor { max-width: 980px; margin: auto; background: #fff; padding: 2rem; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2 { border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; margin-top: 2rem; }
+    label { display: flex; flex-direction: column; margin-bottom: 1rem; font-weight: 500; }
+    input, select, textarea { padding: 0.5rem; font-size: 1rem; margin-top: 0.25rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
     .oculto { display: none !important; }
+    button { padding: 0.6rem 1.2rem; font-size: 1rem; margin: 1rem 0.5rem 0 0; cursor: pointer; }
+    .botones { margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+    header { display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem; margin-bottom: 2rem; }
+    header img { height: 60px; }
+    header h1 { margin: 0; font-size: 1.5rem; color: #2c3e50; }
+    header p { margin: 0; font-size: 0.9rem; }
   </style>
 </head>
 <body>
   <div class="contenedor">
-    <!-- 1) Encabezado -->
-    <div style="background:#fff;padding:1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ccc;">
-      <div style="display:flex;align-items:center;">
-        <img src="/logo.png" alt="Logo Rai Trai" style="height:60px;margin-right:1rem;">
-        <div>
-          <h2 style="margin:0;font-size:1.5rem;color:#2c3e50;">GENERADOR AUTOMÁTICO DE CONTRATOS</h2>
-          <p style="margin:0;font-size:0.9rem;"><strong>Giras de estudio Rai Trai</strong></p>
-        </div>
+    <!-- Encabezado -->
+    <header>
+      <img src="/logo.png" alt="Logo Rai Trai">
+      <div>
+        <h1>GENERADOR AUTOMÁTICO DE CONTRATOS</h1>
+        <p><strong>Giras de estudio Rai Trai</strong></p>
       </div>
-    </div>
+    </header>
 
-    <!-- 2) Selección de grupo -->
+    <!-- Grupo -->
     <h2>Seleccionar Grupo</h2>
-    <label>Número de Negocio:
-      <input list="businessList" id="numeroNegocio" placeholder="Buscar..." />
-    </label>
-    <datalist id="businessList"></datalist>
-
-    <label>Nombre de Grupo:
-      <input list="grupoList" id="nombreGrupo" placeholder="Buscar..." />
-    </label>
-    <datalist id="grupoList"></datalist>
+    <div class="grid">
+      <label>Número de Negocio:
+        <input list="businessList" id="numeroNegocio" placeholder="Buscar..." />
+        <datalist id="businessList"></datalist>
+      </label>
+      <label>Nombre de Grupo:
+        <input list="grupoList" id="nombreGrupo" placeholder="Buscar..." />
+        <datalist id="grupoList"></datalist>
+      </label>
+    </div>
 
     <!-- Definiciones del contrato -->
     <h2>Definiciones del Contrato</h2>
-    <label>Email destinatario:
-      <input list="emailList" id="DEST_EMAIL" />
-    </label>
-    <datalist id="emailList">
-      <option value="nachopastorpino@gmail.com">
-      <option value="griveros@raitrai.cl">
-      <option value="cgayoso@raitrai.cl">
-      <option value="crojas@raitrai.cl">
-      <option value="orietta@raitrai.cl">
-      <option value="elagos@raitrai.cl">
-      <option value="aflores@raitrai.cl">
-      <option value="chernandez@raitrai.cl">
-    </datalist>
-    <label>Moneda:<select id="MONEDA">
-      <option value="">Selecciona moneda</option>
-      <option value="$USD">$USD</option>
-      <option value="$CLP">$CLP</option>
-    </select></label>
+    <div class="grid">
+      <label>Email destinatario:
+        <input list="emailList" id="DEST_EMAIL" />
+        <datalist id="emailList">
+          <option value="nachopastorpino@gmail.com">
+          <option value="griveros@raitrai.cl">
+          <option value="cgayoso@raitrai.cl">
+          <option value="crojas@raitrai.cl">
+          <option value="orietta@raitrai.cl">
+          <option value="elagos@raitrai.cl">
+          <option value="aflores@raitrai.cl">
+          <option value="chernandez@raitrai.cl">
+        </datalist>
+      </label>
+      <label>Moneda:
+        <select id="MONEDA">
+          <option value="">Selecciona moneda</option>
+          <option value="$USD">$USD</option>
+          <option value="$CLP">$CLP</option>
+        </select>
+      </label>
+    </div>
 
-    <!-- 3) Datos del contrato -->
+    <!-- Datos del contrato -->
     <h2>Datos del Contrato</h2>
     <div class="grid">
       <label>Fecha del Contrato:<input type="date" id="FECHA_CONTRATO" /></label>
+      <label>Mes del Viaje:<input type="text" id="MES_VIAJE" /></label>
+      <label>Lugar de Salida:<input type="text" id="LUGAR_SALIDA" /></label>
+
       <label>Curso:<input type="text" id="CURSO" /></label>
-      <label>Año:<input type="number" id="AÑO" /></label>
       <label>Colegio:<input type="text" id="COLEGIO" /></label>
+      <label>Año:<input type="number" id="AÑO" /></label>
+
       <label>Comuna:<input type="text" id="COMUNA" /></label>
-      <label>Valor del Programa:<input type="text" id="VALOR_PROGRAMA" /></label>
       <label>Cantidad de Pax:<input type="number" id="PAX_MIN" /></label>
       <label>Pax Liberados:<input type="text" id="PAX_LIBERADOS" /></label>
-      <label>
-      Cuota Inscripción:
-      <input type="text" id="CUOTA_INSCRIPCION" />
-      <br>
-      <small><label><input type="checkbox" id="DIVIDIR_CUOTA" /> ¿Dividir en 2 pagos?</label></small>
-      </label>
+
+      <label>Valor del Programa:<input type="text" id="VALOR_PROGRAMA" /></label>
+      <label>Cuota Inscripción:<input type="text" id="CUOTA_INSCRIPCION" /></label>
+      <label>Día de Pago Mensual:<input type="number" id="DIA_PAGO" /></label>
+
       <label>Fecha Inicio de Pago:<input type="date" id="FECHA_INICIO_PAGO" /></label>
       <label>Fecha Término de Pago:<input type="date" id="FECHA_FIN_PAGO" /></label>
+      <label><small><input type="checkbox" id="DIVIDIR_CUOTA" /> ¿Dividir en 2 pagos?</small></label>
+
       <label>Número de Cuotas:<input type="number" id="NUM_CUOTAS" /></label>
       <label>Valor de Cuota:<input type="text" id="CUOTA_MENSUAL" /></label>
+      <label>Fecha Límite:<input type="date" id="FECHA_CORTE" /></label>
+
       <label class="oculto">Mes Inicio Pago:<input type="text" id="MES_INICIO" /></label>
       <label class="oculto">Año Inicio Pago:<input type="number" id="ANO_INICIO" /></label>
       <label class="oculto">Mes Fin Pago:<input type="text" id="MES_FIN" /></label>
       <label class="oculto">Año Fin Pago:<input type="number" id="ANO_FIN" /></label>
-      <label>Día de Pago Mensual:<input type="number" id="DIA_PAGO" /></label>
-      <label>Fecha Límite:<input type="date" id="FECHA_CORTE" /></label>
-      <label>Mes del Viaje:<input type="text" id="MES_VIAJE" /></label>
-      <label>Lugar de Salida:<input type="text" id="LUGAR_SALIDA" /></label>
     </div>
 
-    <!-- ⛔ Campos ocultos solo para el correo -->
     <input type="hidden" id="AUTORIZACION" />
     <input type="hidden" id="DESCUENTO" />
     <input type="hidden" id="nombreGrupo" />
 
-    <!-- 4) Cláusulas adicionales -->
+    <!-- Cláusulas -->
     <h2>Cláusulas adicionales</h2>
     <div id="clausulasContainer"></div>
-    <button id="addClause" style="margin-bottom:1rem;">➕ Agregar cláusula</button>
+    <button id="addClause">➕ Agregar cláusula</button>
 
-    <!-- 5) Generar -->
-    <button onclick="generarContrato()">📄 Descargar Contrato</button>
+    <!-- Botones -->
+    <div class="botones">
+      <button onclick="generarContrato()">📄 Descargar Contrato</button>
+    </div>
     <div id="estado" style="margin-top:1rem;font-style:italic;color:#c0392b;"></div>
   </div>
 
