@@ -31,10 +31,10 @@
       </label>
     </div>
 
-    <!-- Definiciones del contrato -->
-    <h2>Definiciones del Contrato</h2>
+    <!-- Información de responsable del contrato -->
+    <h2>Responsable del Contrato</h2>
     <div class="grid">
-      <label style="grid-column: span 3;">Email destinatario:
+      <label style="grid-column: span 3;">Correo electrónico:
         <input list="emailList" id="DEST_EMAIL" />
         <datalist id="emailList">
           <option value="nachopastorpino@gmail.com">
@@ -180,6 +180,13 @@
                   document.getElementById("COLEGIO").value = nombreLimpio;
                   document.getElementById("CURSO").value = ultima[1]; // Ej: 3B
                   document.getElementById("AÑO").value   = ultima[2]; // Ej: 2026
+                }
+
+                  // Autocompletar fecha de corte como 15 de marzo del año detectado
+                  const añoDetectado = parseInt(ultima[2]);
+                  if (!isNaN(añoDetectado)) {
+                  const fechaCorte = new Date(añoDetectado, 2, 15); // mes 2 = marzo
+                  document.getElementById("FECHA_CORTE").value = fechaCorte.toISOString().split("T")[0];
                 }
     
                 // 📥 Rellenar todos los campos con la información correspondiente
