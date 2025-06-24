@@ -326,6 +326,23 @@
     
       console.log("✅ Cálculo terminado y actualizado.");
     }
+
+    // 📌 Ajustar automáticamente la cuota de inscripción si se modifica la cuota mensual manualmente
+    document.getElementById("CUOTA_MENSUAL").addEventListener("input", () => {
+      const parseMonto = val => parseFloat((val || '').replace(/[^\d.]/g, '')) || 0;
+    
+      const valorPrograma = parseMonto(document.getElementById('VALOR_PROGRAMA').value);
+      const cuotaMensual = parseMonto(document.getElementById('CUOTA_MENSUAL').value);
+      const cuotas = parseInt(document.getElementById('NUM_CUOTAS').value);
+    
+      if (!valorPrograma || !cuotaMensual || !cuotas) return;
+    
+      const nuevaInscripcion = valorPrograma - (cuotaMensual * cuotas);
+      if (nuevaInscripcion >= 0) {
+        document.getElementById('CUOTA_INSCRIPCION').value = nuevaInscripcion.toFixed(2).replace('.', ',');
+      }
+    });
+
     
     function agregarFirmante() {
       const div = document.createElement("div");
