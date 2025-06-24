@@ -37,7 +37,6 @@
       <label style="grid-column: span 2;">Email destinatario:
         <input list="emailList" id="DEST_EMAIL" />
         <datalist id="emailList">
-          <option value="">Selecciona o Ingresa tu correo electrónico</option>
           <option value="nachopastorpino@gmail.com">
           <option value="griveros@raitrai.cl">
           <option value="cgayoso@raitrai.cl">
@@ -61,7 +60,23 @@
     <h2>Datos del Contrato</h2>
     <div class="grid">
       <label>Fecha del Contrato:<input type="date" id="FECHA_CONTRATO" /></label>
-      <label>Mes del Viaje:<input type="text" id="MES_VIAJE" /></label>
+      <label>Mes del Viaje:
+        <select id="MES_VIAJE">
+          <option value="">Selecciona mes</option>
+          <option value="DICIEMBRE">DICIEMBRE</option>
+          <option value="NOVIEMBRE">NOVIEMBRE</option>
+          <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+          <option value="ENERO">ENERO</option>
+          <option value="FEBRERO">ENERO</option>
+          <option value="MARZO">MARZO</option>
+          <option value="ABRIL">ABRIL</option>
+          <option value="MAYO">MAYO</option>
+          <option value="JUNIO">JUNIO</option>
+          <option value="JULIO">JULIO</option>
+          <option value="AGOSTO">AGOSTO</option>
+          <option value="OCTUBRE">OCTUBRE</option>
+        </select>
+      </label>
       <label>Lugar de Salida:<input type="text" id="LUGAR_SALIDA" /></label>
 
       <label>Curso:<input type="text" id="CURSO" /></label>
