@@ -136,19 +136,7 @@
     const sheetURL = 'https://script.google.com/macros/s/AKfycbzU3RIF2TXDhlUwuSZj9VFnEienz0_XPw1mVwqzj6TWL3afs4GE-9kFkaRy9ps5YSqFaQ/exec';
 
     // 🔁 Carga de grupos y configuración de autocompletado robusto
-    window.addEventListener("DOMContentLoaded", () => {
-      // ✅ Si hay parámetro ?numero= en la URL, autocompletar
-      const params = new URLSearchParams(window.location.search);
-      const numeroPredefinido = params.get("numero");
-      if (numeroPredefinido) {
-        const input = document.getElementById("numeroNegocio");
-        input.value = numeroPredefinido;
-      
-        // 🔁 Forzar disparar el evento de input para que se active el autocompletado
-        input.dispatchEvent(new Event("input", { bubbles: true }));
-        input.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-      
+    window.addEventListener("DOMContentLoaded", () => {    
       // 🕒 Establecer la fecha actual en el campo "Fecha del Contrato"
       const hoy = new Date();
       const mañana = new Date();
@@ -169,7 +157,7 @@
             if (r.numeroNegocio) bl.append(new Option(r.numeroNegocio, r.numeroNegocio));
             if (r.nombreGrupo)   gl.append(new Option(r.nombreGrupo,   r.nombreGrupo));
           });
-    
+              
           // 🎯 Detectar cambios en ambos campos y hacer autocompletado
           ["numeroNegocio", "nombreGrupo"].forEach(id => {
             const el = document.getElementById(id);
@@ -221,6 +209,14 @@
               });
             });
           });
+          const params = new URLSearchParams(window.location.search);
+          const numeroPredefinido = params.get("numero");
+          if (numeroPredefinido) {
+            const input = document.getElementById("numeroNegocio");
+            input.value = numeroPredefinido;
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+          }
         })
         .catch(err => {
           console.error("Error leyendo datos:", err);
