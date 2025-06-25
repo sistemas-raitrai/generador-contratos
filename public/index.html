@@ -419,7 +419,7 @@
     async function generarContrato() {
       const campos = [
         "numeroNegocio", "FECHA_CONTRATO", "CURSO", "AÑO", "COLEGIO", "COMUNA", "VALOR_PROGRAMA",
-        "PAX_MIN", "PAX_LIBERADOS", "DEST_EMAIL", "MONEDA", "CUOTA_INSCRIPCION", "FECHA_INICIO_PAGO",
+        "PAX_MIN", "PAX_LIBERADOS", "DEST_EMAIL", "MONEDA", "CUOTA_INSCRIPCION", "FECHA_INICIO_PAGO",More actions
         "FECHA_FIN_PAGO", "NUM_CUOTAS", "CUOTA_MENSUAL", "MES_INICIO", "ANO_INICIO",
         "MES_FIN", "ANO_FIN", "DIA_PAGO", "FECHA_CORTE",
         "MES_VIAJE", "LUGAR_SALIDA", "AUTORIZACION", "DESCUENTO", "nombreGrupo" // ✅ añadido aquí
@@ -448,7 +448,7 @@
       data.AQUI2 = document.getElementById("DIVIDIR_CUOTA").checked
         ? "el primer pago de la Cuota de inscripción + 1 mes después el segundo pago "
         : "";
-      
+
       data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div => ({
         titulo: div.querySelector("input[name=titulo]").value,
         texto: div.querySelector("textarea[name=texto]").value
@@ -458,11 +458,11 @@
         const nombre = div.querySelector(".nombreFirmante")?.value.trim();
         const rut = div.querySelector(".rutFirmante")?.value.trim();
         return nombre && rut
-          ? <tr>
+          ? `<tr>
                <td style="padding: 6px 10px;">${i + 1}. ${nombre}</td>
                <td style="padding: 6px 10px;">${rut}</td>
                <td style="padding: 6px 10px;">___________________</td>
-             </tr>
+             </tr>`
           : null;
       }).filter(Boolean).join("");
 
@@ -473,7 +473,7 @@
         ["CUOTA_MENSUAL", "CUOTA_INSCRIPCION", "VALOR_PROGRAMA"].forEach(key => {
           if (data[key]) data[key] = data[key].replace(",", ".");
         });
-        
+
         const res = await fetch("/api/generar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
