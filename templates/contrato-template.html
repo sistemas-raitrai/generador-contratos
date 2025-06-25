@@ -193,20 +193,36 @@
   <div style="page-break-before: always;"></div>
   <h2><strong>Número de negocio {{numeroNegocio}}.</strong></h2>
   <p>En comprobante, previa lectura firman y ratifican como representante del grupo.</p>
-  
-  <div class="firma">
+
+    <div class="firma">
     <table style="width:100%; border-collapse:collapse;">
-      <tr>
-        <td><strong>POR TURISMO RAITRAI</strong></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>CARLOS FLORES MARAGAÑO</td>
-        <td>7.844.528 - 9</td>
-        <td>__________________________</td>
-      </tr>
+      <thead>
+        <tr>
+          <th style="text-align:left;">NOMBRE(S) Y APELLIDO(S)</th>
+          <th style="text-align:left;">RUT</th>
+          <th style="text-align:left;">FIRMA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{firmantes}}
+      </tbody>
     </table>
-  </div>
+   </div>
+
+    <div class="firma">
+      <table style="width:100%; border-collapse:collapse;">
+        <tr>
+          <td><strong>POR TURISMO RAITRAI</strong></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>CARLOS FLORES MARAGAÑO</td>
+          <td>7.844.528 - 9</td>
+          <td>__________________________</td>
+        </tr>
+      </table>
+    </div>
+  
 </body>
 </html>
