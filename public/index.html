@@ -129,13 +129,36 @@
     </div>
     <button type="button" onclick="agregarFirmante()">➕ Agregar otro firmante</button>
 
-    <!--
-        <!-- Cláusulas -->
-        <h2>Cláusulas adicionales</h2>
-        <div id="clausulasContainer"></div>
-        <button id="addClause">➕ Agregar cláusula</button>
-    -->
-  
+    <!-- Cláusulas 
+    <h2>Cláusulas adicionales</h2>
+    <div id="clausulasContainer"></div>
+    <button id="addClause">➕ Agregar cláusula</button>-->
+
+    <h2>Adjuntar Anexos</h2>
+
+    <div>
+      <label><input type="checkbox" id="incluirAnexo1"> Incluir Anexo 1 (archivo adjunto)</label>
+      <input type="file" id="archivoAnexo1" accept=".pdf,.docx,.doc" />
+    </div>
+    
+    <div>
+      <label><input type="checkbox" id="incluirAnexo2"> Incluir Anexo 2 (asistencia médica)</label>
+      <select id="archivoAnexo2">
+        <option value="">Selecciona un documento</option>
+        <option value="ASSIST CARD 60 - Asistencia Médica.pdf">ASSIST CARD 60</option>
+        <option value="ASSIST CARD 150 - Asistencia Médica.pdf">ASSIST CARD 150</option>
+        <option value="MAPFRE 60 - Asistencia Médica.pdf">MAPFRE 60</option>
+        <option value="MAPFRE 150 - Asistencia Médica.pdf">MAPFRE 150</option>
+        <option value="MAPFRE 250 - Asistencia Médica.pdf">MAPFRE 250</option>
+        <option value="UNIVERSAL 80 - Asistencia Médica.pdf">UNIVERSAL 80</option>
+        <option value="UNIVERSAL 150 - Asistencia Médica.pdf">UNIVERSAL 150</option>
+      </select>
+    </div>
+    
+    <div>
+      <label><input type="checkbox" id="incluirAnexo3"> Incluir Anexo 3 (condiciones cancelación)</label>
+    </div>
+
     <!-- Botones -->
     <div class="botones">
       <button onclick="validarYGenerar()">📄 Descargar Contrato</button>
@@ -446,18 +469,42 @@
       document.getElementById("estado").textContent = "⏳ Generando contrato…";
 
       try {
-       // ✅ Reemplazar comas por puntos en montos numéricos antes de enviar
-        ["CUOTA_MENSUAL", "CUOTA_INSCRIPCION", "VALOR_PROGRAMA"].forEach(key => {
-          if (data[key]) data[key] = data[key].replace(",", ".");
-        });
+        // Crear FormData y agregar campos
+        const formData = new FormData();
         
+        for (const key of Object.keys(data)) {
+          // Reemplazar comas por puntos en montos
+          if (["CUOTA_MENSUAL", "CUOTA_INSCRIPCION", "VALOR_PROGRAMA"].includes(key)) {
+            formData.append(key, data[key].replace(",", "."));
+          } else {
+            formData.append(key, data[key]);
+          }
+        }
+      
+        // 🔁 Anexos
+        if (document.getElementById("incluirAnexo1")?.checked) {
+          const file = document.getElementById("archivoAnexo1").files[0];
+          if (file) formData.append("anexo1", file);
+          formData.append("incluirAnexo1", "true");
+        }
+      
+        if (document.getElementById("incluirAnexo2")?.checked) {
+          const nombre = document.getElementById("archivoAnexo2").value;
+          if (nombre) formData.append("anexo2Nombre", nombre);
+          formData.append("incluirAnexo2", "true");
+        }
+      
+        if (document.getElementById("incluirAnexo3")?.checked) {
+          formData.append("incluirAnexo3", "true");
+        }
+      
         const res = await fetch("/api/generar", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
+          body: formData
         });
+      
         if (!res.ok) throw new Error(await res.text());
-
+      
         const blob = await res.blob();
         const fn = res.headers.get("Content-Disposition")?.match(/filename="?(.+?)"?$/)?.[1] || "Contrato.docx";
         const a = document.createElement("a");
