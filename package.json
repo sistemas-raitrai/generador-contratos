@@ -8,5 +8,6 @@
     "nodemailer": "^6.9.1",
     "@sendgrid/mail": "^7.7.0",
     "html-docx-js": "0.3.1"
+    "formidable": "^3.5.0"
   }
 }
