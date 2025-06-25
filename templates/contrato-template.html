@@ -29,19 +29,17 @@
     }
   
     p {
-      text-align: left;
+      text-align: justify;
       text-indent: 0; /* desactiva sangría */
       font-size: 11pt;
       margin: 0;
     }
 
-   .sangria {
-      display: block;
-      padding-left: 1em; /* o text-indent: 1em si prefieres */
-      margin: 0;
+    .sangria {
+      margin-left: 1em;
+      text-indent: 0; /* opcional: refuerza que no haya doble sangría */
     }
-  
- 
+   
     .firma {
       margin-top: 2rem;
       font-size: 11pt;
@@ -193,9 +191,9 @@
   <p>&nbsp;</p>
   <p><strong>DÉCIMO NOVENO:</strong> Para todos los efectos legales las partes fijan su domicilio en la ciudad de Santiago, comuna de Providencia. Se suscribe en DOS ejemplares, queda uno en poder de TURISMO RAITRAI  y otro en poder de los DELEGADOS del grupo curso.</p>
   <p>&nbsp;</p>
-  <p> <strong>Número de negocio {{numeroNegocio}}.</strong></p>
+  <p><strong>Número de negocio {{numeroNegocio}}.</strong></p>
   <p>En comprobante, previa lectura firman y ratifican como representante del grupo.</p>
-  <p>&nbsp;</p>
+  
   <div class="firma">
     <table style="width:100%; border-collapse:collapse;">
       <thead>
