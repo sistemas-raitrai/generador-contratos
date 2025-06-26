@@ -375,7 +375,14 @@
         <input type="text" placeholder="RUT - Con puntos y con guion" class="rutFirmante" />
       `;
       document.getElementById("firmantesContainer").appendChild(div);
-    }  
+
+      // ✅ Forzar mayúsculas en los nuevos inputs agregados
+      div.querySelectorAll("input").forEach(input => {
+        input.addEventListener("input", () => {
+          input.value = input.value.toUpperCase();
+        });
+      });
+    }
 
     // ✅ Convierte fecha ISO (2025-06-24) a formato chileno (24 de junio de 2025)
     function formatearFechaChilena(fechaISO) {
