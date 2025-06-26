@@ -458,13 +458,14 @@
         const nombre = div.querySelector(".nombreFirmante")?.value.trim();
         const rut = div.querySelector(".rutFirmante")?.value.trim();
         return nombre && rut
-          ? `<tr>
-               <td style="padding: 6px 10px;">${i + 1}. ${nombre}</td>
-               <td style="padding: 6px 10px;">${rut}</td>
-               <td style="padding: 6px 10px;">___________________</td>
-             </tr>`
+          ? (
+              `<tr>
+                <td style="padding: 6px 10px;">${i + 1}. ${nombre}</td>
+                <td style="padding: 6px 10px;">${rut}</td>
+                <td style="padding: 6px 10px;">___________________</td>
+              </tr>`
+            )
           : null;
-      }).filter(Boolean).join("");
 
       document.getElementById("estado").textContent = "⏳ Generando contrato…";
 
