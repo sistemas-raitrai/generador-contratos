@@ -421,66 +421,65 @@
         "numeroNegocio", "FECHA_CONTRATO", "CURSO", "AÑO", "COLEGIO", "COMUNA", "VALOR_PROGRAMA",
         "PAX_MIN", "PAX_LIBERADOS", "DEST_EMAIL", "MONEDA", "CUOTA_INSCRIPCION", "FECHA_INICIO_PAGO",
         "FECHA_FIN_PAGO", "NUM_CUOTAS", "CUOTA_MENSUAL", "MES_INICIO", "ANO_INICIO",
-        "MES_FIN", "ANO_FIN", "DIA_PAGO", "FECHA_CORTE", "MES_VIAJE", "LUGAR_SALIDA", "AUTORIZACION", "DESCUENTO", "nombreGrupo" // ✅ añadido aquí
+        "MES_FIN", "ANO_FIN", "DIA_PAGO", "FECHA_CORTE", "MES_VIAJE", "LUGAR_SALIDA", "AUTORIZACION", "DESCUENTO", "nombreGrupo"
       ];
-
+    
       const data = {};
       campos.forEach(id => data[id] = document.getElementById(id)?.value || "");
-
+    
       // 🎯 Reemplazar fechas ISO por formato chileno
       const fechasFormateadas = ["FECHA_CONTRATO", "FECHA_INICIO_PAGO", "FECHA_FIN_PAGO", "FECHA_CORTE"];
       fechasFormateadas.forEach(key => {
         data[key] = formatearFechaChilena(data[key]);
       });
-
+    
       // Alias para plantillas Word
       data.AÑO1 = data.AÑO;
       data.MONEDA1 = data.MONEDA;
       data.MONEDA2 = data.MONEDA;
       data.VALOR_PROGRAMA1 = data.VALOR_PROGRAMA;
       data.CUOTA_INSCRIPCION1 = data.CUOTA_INSCRIPCION;
-
+    
       data.AQUI = document.getElementById("DIVIDIR_CUOTA").checked
         ? " (dividida en dos partes que se pagarán como concepto de cuota mensual en los primeros dos pagos)"
         : "";
-
+    
       data.AQUI2 = document.getElementById("DIVIDIR_CUOTA").checked
         ? "el primer pago de la Cuota de inscripción + 1 mes después el segundo pago "
         : "";
-
+    
       data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div => ({
         titulo: div.querySelector("input[name=titulo]").value,
         texto: div.querySelector("textarea[name=texto]").value
       })).filter(c => c.titulo || c.texto);
-
+    
       data.firmantes = Array.from(document.querySelectorAll(".firmante")).map((div, i) => {
         const nombre = div.querySelector(".nombreFirmante")?.value.trim();
         const rut = div.querySelector(".rutFirmante")?.value.trim();
         return nombre && rut
-          ? (
-              `<tr>
-                <td style="padding: 6px 10px;">${i + 1}. ${nombre}</td>
-                <td style="padding: 6px 10px;">${rut}</td>
-                <td style="padding: 6px 10px;">___________________</td>
-              </tr>`
-            )
+          ? `<tr>
+              <td style="padding: 6px 10px;">${i + 1}. ${nombre}</td>
+              <td style="padding: 6px 10px;">${rut}</td>
+              <td style="padding: 6px 10px;">___________________</td>
+            </tr>`
           : null;
-
+      }).filter(Boolean).join("");
+    
       document.getElementById("estado").textContent = "⏳ Generando contrato…";
-
+    
       try {
-       // ✅ Reemplazar comas por puntos en montos numéricos antes de enviar
+        // ✅ Reemplazar comas por puntos en montos numéricos antes de enviar
         ["CUOTA_MENSUAL", "CUOTA_INSCRIPCION", "VALOR_PROGRAMA"].forEach(key => {
           if (data[key]) data[key] = data[key].replace(",", ".");
         });
-
+    
         const res = await fetch("/api/generar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(await res.text());
-
+    
         const blob = await res.blob();
         const fn = res.headers.get("Content-Disposition")?.match(/filename="?(.+?)"?$/)?.[1] || "Contrato.docx";
         const a = document.createElement("a");
