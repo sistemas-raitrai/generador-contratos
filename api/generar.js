@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import docx from 'html-docx-js';
 import { promisify } from 'util';
-import sgMail from '@sendgrid/mail'; // ✅ NUEVO: en lugar de "resend"
+import sgMail from '@sendgrid/mail';
 
 const readFile = promisify(fs.readFile);
 
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
       html = html.replace(regex, datos[key]);
     }
-
+    
     // 3️⃣ Convertir HTML a DOCX
     const docxBuffer = await docx.asBlob(html);
     const arrayBuffer = await docxBuffer.arrayBuffer();
@@ -37,10 +37,8 @@ export default async function handler(req, res) {
 
     // 🛡️ Normalizar nombre de archivo para evitar caracteres conflictivos en encabezados HTTP
     const filenameSeguro = filename
-      .normalize("NFD")                          // separa acentos
-      .replace(/[\u0300-\u036f]/g, "")          // elimina los acentos
-      .replace(/[^\x00-\x7F]/g, "")             // elimina cualquier carácter no ASCII
-      .replace(/\s+/g, "_");                    // reemplaza espacios por guiones bajos (opcional)
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\x00-\x7F]/g, "").replace(/\s+/g, "_");
 
     // 5️⃣ Texto plano del correo
     const textoCorreo = `Estimado/a:
@@ -56,17 +54,15 @@ Equipo RaiTrai`;
     // 6️⃣ Enviar email con SendGrid
     await sgMail.send({
       to: [datos.DEST_EMAIL, 'administracion@raitrai.cl'],
-      from: 'notificaciones@raitrai.online', // ✅ Usar remitente verificado
+      from: 'notificaciones@raitrai.online',
       subject: `Contrato ${datos.CURSO} ${datos.COLEGIO} ${datos.AÑO}`,
       text: textoCorreo,
-      attachments: [
-        {
-          content: bufferFinal.toString('base64'),
-          filename,
-          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          disposition: 'attachment'
-        }
-      ]
+      attachments: [{
+        content: bufferFinal.toString('base64'),
+        filename,
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        disposition: 'attachment'
+      }]
     });
 
     // 7️⃣ Descargar archivo como respuesta
