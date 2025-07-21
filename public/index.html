@@ -501,6 +501,99 @@
         document.getElementById("estado").textContent = "";
       }
     }
+
+    // Validación común
+    function camposValidos(ignore = []) {
+      const inputs = document.querySelectorAll("input, select, textarea");
+      let faltantes = [];
+      inputs.forEach(el => {
+        if (!el.id || ignore.includes(el.id)) return;
+        const visible = el.offsetParent !== null;
+        const requerido = el.type !== "hidden" && el.type !== "checkbox";
+        if (requerido && visible && !el.value.trim()) {
+          faltantes.push(el.id);
+        }
+      });
+      if (faltantes.length) {
+        alert("⚠️ Faltan campos por completar:\n" + faltantes.join(", "));
+        return false;
+      }
+      return true;
+    }
+
+    // Función original para descargar
+    function validarYGenerar() {
+      if (!camposValidos(["DIVIDIR_CUOTA"])) return;
+      generarContrato(); // tu función ya existente
+    }
+
+    // Nueva función para enviar por email
+    async function validarYEnviar() {
+      if (!camposValidos(["DIVIDIR_CUOTA"])) return;
+
+      // @estado
+      const estadoEl = document.getElementById("estado");
+      const msgEl = document.getElementById("mensajeEnvio");
+      estadoEl.textContent = "⏳ Enviando contrato…";
+      msgEl.textContent = "";
+
+      // Recolectar datos igual que en generarContrato()
+      const campos = [
+        "numeroNegocio","FECHA_CONTRATO","CURSO","AÑO","COLEGIO","COMUNA","VALOR_PROGRAMA",
+        "PAX_MIN","PAX_LIBERADOS","DEST_EMAIL","MONEDA","CUOTA_INSCRIPCION","FECHA_INICIO_PAGO",
+        "FECHA_FIN_PAGO","NUM_CUOTAS","CUOTA_MENSUAL","MES_INICIO","ANO_INICIO",
+        "MES_FIN","ANO_FIN","DIA_PAGO","FECHA_CORTE","MES_VIAJE","LUGAR_SALIDA",
+        "AUTORIZACION","DESCUENTO","nombreGrupo"
+      ];
+      const data = {};
+      campos.forEach(id => data[id] = document.getElementById(id)?.value || "");
+
+      // Formatear fechas chilenas
+      ["FECHA_CONTRATO","FECHA_INICIO_PAGO","FECHA_FIN_PAGO","FECHA_CORTE"].forEach(key => {
+        data[key] = formatearFechaChilena(data[key]);
+      });
+
+      // Añadir alias para plantilla
+      data.AÑO1 = data.AÑO;
+      data.MONEDA1 = data.MONEDA;
+      data.MONEDA2 = data.MONEDA;
+      data.VALOR_PROGRAMA1 = data.VALOR_PROGRAMA;
+      data.CUOTA_INSCRIPCION1 = data.CUOTA_INSCRIPCION;
+      data.AQUI = document.getElementById("DIVIDIR_CUOTA").checked
+        ? " (dividida en dos partes...)" : "";
+      data.AQUI2 = document.getElementById("DIVIDIR_CUOTA").checked
+        ? "el primer pago... el segundo pago" : "";
+
+      // Firmantes y cláusulas (si aplica)
+      data.clausulas = Array.from(document.querySelectorAll(".clausula")).map(div => ({
+        titulo: div.querySelector("input[name=titulo]").value,
+        texto:  div.querySelector("textarea[name=texto]").value
+      })).filter(c => c.titulo || c.texto);
+      data.firmantes = Array.from(document.querySelectorAll(".firmante")).map((div,i) => {
+        const n = div.querySelector(".nombreFirmante")?.value.trim();
+        const r = div.querySelector(".rutFirmante")?.value.trim();
+        return n && r
+          ? `<tr><td>${i+1}. ${n}</td><td>${r}</td><td>___________________</td></tr>`
+          : null;
+      }).filter(Boolean).join("");
+
+      try {
+        const res = await fetch("/api/enviar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(await res.text());
+
+        estadoEl.textContent = "";
+        msgEl.style.color = "#27ae60";
+        msgEl.textContent = "✅ Contrato enviado correctamente.";
+      } catch (err) {
+        estadoEl.textContent = "";
+        msgEl.style.color = "#c0392b";
+        msgEl.textContent = `❌ Error al enviar: ${err.message}`;
+      }
+    }
   </script>
 </body>
 </html>
