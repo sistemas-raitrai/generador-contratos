@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     const textoCorreo = `Estimado/a:
 
-Adjuntamos el contrato correspondiente al grupo "${datos.nombreGrupo}", programado para el año ${datos.AÑO}. 
+Adjuntamos el contrato correspondiente al grupo "${datos.nombreGrupo}", programado para el año ${datos.AÑO}, creado por "${datos.DEST_EMAIL}. 
 En la ficha, el campo de autorización dice "${datos.AUTORIZACION}" y el campo descuento "${datos.DESCUENTO}".
 Por favor revisa y convierte a PDF cuando corresponda.
 
